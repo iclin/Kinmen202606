@@ -34,6 +34,7 @@
 
     <div class="max-w-md mx-auto min-h-screen bg-[#f7fafc] shadow-2xl relative flex flex-col">
         
+        <!-- 頂部卡片：Header -->
         <header class="bg-gradient-to-b from-[#dbe9f6] to-[#f7fafc] px-6 pt-10 pb-6 rounded-b-[2.5rem] shadow-sm relative">
             <div class="flex justify-between items-start">
                 <div>
@@ -45,11 +46,19 @@
                         📅 2026.06.13 - 06.15 (三日自駕遊)
                     </p>
                 </div>
+                <!-- 狀態指示燈：本機或雲端 -->
                 <div id="cloud-status-badge" class="flex items-center gap-1.5 text-xs bg-amber-50 border border-amber-200 text-amber-700 px-3 py-1.5 rounded-full shadow-sm transition-all duration-300 shrink-0">
                     <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
                     <span id="cloud-status-text">📦 本機手帳</span>
                 </div>
             </div>
+
+            <!-- 可愛裝飾貼紙 -->
+            <div class="absolute -bottom-2 right-8 bg-[#fdf2e9] text-amber-700 text-[10px] px-3 py-1 rounded-full border border-amber-200/50 transform rotate-6 shadow-sm z-10">
+                🚗 自駕暢遊中!
+            </div>
+            <div class="absolute top-4 right-4 text-2xl opacity-20">✈️</div>
+        </header>
 
         <!-- 主體內容區 (Tabs 切換) -->
         <main class="flex-1 px-4 py-4" id="main-content">
@@ -134,8 +143,10 @@
                 </div>
             </div>
 
+            <!-- Tab 3: 記帳分帳頁面 -->
             <div id="tab-billing" class="tab-content hidden space-y-5">
                 
+                <!-- 記帳主面板 -->
                 <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-bold text-base text-slate-800 flex items-center gap-1.5">
@@ -144,6 +155,7 @@
                         <span class="text-[10px] text-slate-400 font-bold">WU • LIU • LEE • LIN</span>
                     </div>
 
+                    <!-- 快速記帳表單 -->
                     <form id="billing-form" class="space-y-3 bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
                         <div>
                             <label class="block text-[11px] text-slate-500 font-bold mb-1">📝 消費項目</label>
@@ -165,6 +177,7 @@
                             </div>
                         </div>
 
+                        <!-- 平分對象 (複選) -->
                         <div>
                             <label class="block text-[11px] text-slate-500 font-bold mb-1.5 flex justify-between">
                                 <span>👥 平分對象</span>
@@ -191,16 +204,19 @@
                         </button>
                     </form>
 
+                    <!-- 當前帳目清單 -->
                     <div class="mt-5">
                         <div class="flex justify-between items-center mb-2">
                             <h4 class="text-xs font-bold text-slate-700">📋 消費紀錄</h4>
                             <button onclick="clearAllBills()" class="text-rose-500 hover:underline text-[10px]">清空帳目</button>
                         </div>
                         <div id="billing-list" class="space-y-2 max-h-56 overflow-y-auto pr-1 no-scrollbar">
-                            </div>
+                            <!-- 帳目動態渲染 -->
+                        </div>
                     </div>
                 </div>
 
+                <!-- 智慧結算清帳與報表 -->
                 <div class="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-3xl p-5 shadow-sm">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="font-bold text-sm text-teal-900 flex items-center gap-1">
@@ -211,13 +227,16 @@
                         </button>
                     </div>
 
+                    <!-- 清帳建議列表 -->
                     <div id="settlement-results" class="space-y-2">
-                        </div>
+                        <!-- 清帳結果渲染 -->
+                    </div>
                 </div>
             </div>
 
         </main>
 
+        <!-- 浮動照片牆 Modal -->
         <div id="photo-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
             <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl border border-slate-100 flex flex-col transform scale-95 transition-all duration-300">
                 <div class="px-6 pt-6 pb-2 flex justify-between items-center">
@@ -225,6 +244,7 @@
                     <button onclick="closePhotoModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">×</button>
                 </div>
                 <div class="p-6 space-y-4">
+                    <!-- 韓式手寫風拍立得預覽框 -->
                     <div class="bg-white border border-slate-200 rounded-lg p-3 pb-8 shadow-md transform polaroid-rotate-left flex flex-col items-center">
                         <div id="polaroid-image-box" class="w-full aspect-[4/3] bg-slate-100 rounded border border-slate-100/50 flex flex-col items-center justify-center text-slate-400 relative overflow-hidden">
                             <span class="text-3xl">🏞️</span>
@@ -236,6 +256,7 @@
                         </div>
                     </div>
 
+                    <!-- 選擇檔案按鈕 -->
                     <div class="flex gap-2">
                         <input type="file" id="photo-file-input" accept="image/*" class="hidden" onchange="previewUserPhoto(event)">
                         <button onclick="document.getElementById('photo-file-input').click()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-bold transition">
@@ -253,6 +274,7 @@
             </div>
         </div>
 
+        <!-- 韓系質感自訂確認彈窗 (已完全修復 unclosed tags 漏洞 🚀) -->
         <div id="custom-alert-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
             <div class="bg-white rounded-3xl w-full max-w-xs p-6 shadow-2xl border border-slate-100 flex flex-col items-center text-center">
                 <span id="alert-icon" class="text-3xl mb-2">💡</span>
@@ -266,7 +288,10 @@
                         確定
                     </button>
                 </div>
-        <!-- 底部固定浮動導覽條 (Glassmorphism Effect) -->
+            </div>
+        </div>
+
+        <!-- 底部固定浮動導覽條 (Glassmorphism Effect - 終於重見天日 ✨) -->
         <nav class="fixed bottom-5 left-4 right-4 max-w-md mx-auto bg-white/80 backdrop-blur-md border border-white/40 py-2 px-3 rounded-3xl shadow-lg flex justify-around items-center z-40">
             <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition bg-sky-50 text-sky-700">
                 <span class="text-lg">🗺️</span>
@@ -294,7 +319,7 @@
         // =========================================================================
         // 🍶 STEP 2: 在這裡貼上您的 FIREBASE CONFIG 金鑰！
         // =========================================================================
-        const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyCZiFniroFlh5yAE_LG7VSfSvE7ZCFat5I",
   authDomain: "kinmen202606.firebaseapp.com",
   databaseURL: "https://kinmen202606-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -460,7 +485,7 @@
                         tagColor: "bg-rose-100 text-rose-700",
                         tips: "一定要點油條，沾著無米粥底吃，才是最道地的閩南吃法！",
                         map: "https://maps.google.com",
-                        parking: "建議可將車子停在附近總兵署旁或金門高中停車場再散步過來。",
+                        parking: "建議可將車子停在附近總兵署旁 or 金門高中停車場再散步過來。",
                         gas: "金城鎮中油加油站就在不遠處。"
                     },
                     {
