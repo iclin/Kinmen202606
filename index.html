@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>微醺高粱．漫遊金門 🍶✨</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Zen Maru Gothic & Playpen Sans (手寫感) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playpen+Sans:wght@400;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
@@ -30,12 +32,14 @@
         }
     </style>
 </head>
+<!-- pb-36 徹底解放底部空間，防止被浮動導覽條遮擋 -->
 <body class="text-slate-800 antialiased min-h-screen pb-36">
 
+    <!-- 手機外殼包覆（在桌機會居中限制寬度，在手機會完美滿版） -->
     <div class="max-w-md mx-auto min-h-screen bg-[#f7fafc] shadow-2xl relative flex flex-col">
         
-        <!-- 頂部卡片：Header -->
-        <header class="bg-gradient-to-b from-[#dbe9f6] to-[#f7fafc] px-6 pt-10 pb-6 rounded-b-[2.5rem] shadow-sm relative">
+        <!-- 頂部卡片：Header (pt-10 防止 iPhone 時間與網頁疊加) -->
+        <header class="bg-gradient-to-b from-[#dbe9f6] to-[#f7fafc] px-6 pt-10 pb-5 rounded-b-[2.5rem] shadow-sm relative">
             <div class="flex justify-between items-start">
                 <div>
                     <span class="text-[10px] tracking-widest font-bold text-sky-700 bg-sky-100/80 px-2.5 py-1 rounded-full">KINMEN TRAVEL LOG</span>
@@ -53,34 +57,36 @@
                 </div>
             </div>
 
-            <!-- 可愛裝飾貼紙 -->
-            <div class="absolute -bottom-2 right-8 bg-[#fdf2e9] text-amber-700 text-[10px] px-3 py-1 rounded-full border border-amber-200/50 transform rotate-6 shadow-sm z-10">
+            <!-- 可愛手帳風格裝飾貼紙 -->
+            <div class="absolute -bottom-2 right-8 bg-[#fdf2e9] text-amber-700 text-[10px] px-3 py-1 rounded-full border border-amber-200/50 transform rotate-6 shadow-sm">
                 🚗 自駕暢遊中!
             </div>
             <div class="absolute top-4 right-4 text-2xl opacity-20">✈️</div>
         </header>
 
-        <!-- 主體內容區 (Tabs 切換) -->
-        <main class="flex-1 px-4 py-4" id="main-content">
-            
-            <!-- Tab 1: 行程頁面 -->
-            <div id="tab-itinerary" class="tab-content block">
-                <!-- Day 選擇器 -->
-                <div class="flex gap-2 mb-4 bg-slate-100 p-1.5 rounded-2xl">
-                    <button onclick="switchDay(1)" id="btn-day-1" class="day-tab-btn flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white text-sky-800 shadow-sm">
-                        Day 1 🐥
-                        <span class="block text-[9px] opacity-70">06/13 (六)</span>
-                    </button>
-                    <button onclick="switchDay(2)" id="btn-day-2" class="day-tab-btn flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-500">
-                        Day 2 🌊
-                        <span class="block text-[9px] opacity-70">06/14 (日)</span>
-                    </button>
-                    <button onclick="switchDay(3)" id="btn-day-3" class="day-tab-btn flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-500">
-                        Day 3 🌾
-                        <span class="block text-[9px] opacity-70">06/15 (一)</span>
-                    </button>
-                </div>
+        <!-- 💡 核心亮點：將 Day 選擇器移至頂層（Global），讓行程與天氣指南都能完美同步連動！ -->
+        <div class="px-4 pt-4 pb-1">
+            <div class="flex gap-2 bg-slate-100 p-1.5 rounded-2xl shadow-inner">
+                <button onclick="switchDay(1)" id="btn-day-1" class="day-tab-btn flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white text-sky-800 shadow-sm">
+                    Day 1 🐥
+                    <span class="block text-[9px] opacity-70">06/13 (六)</span>
+                </button>
+                <button onclick="switchDay(2)" id="btn-day-2" class="day-tab-btn flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-500">
+                    Day 2 🌊
+                    <span class="block text-[9px] opacity-70">06/14 (日)</span>
+                </button>
+                <button onclick="switchDay(3)" id="btn-day-3" class="day-tab-btn flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-500">
+                    Day 3 🌾
+                    <span class="block text-[9px] opacity-70">06/15 (一)</span>
+                </button>
+            </div>
+        </div>
 
+        <!-- 主體內容區 (Tabs 切換) -->
+        <main class="flex-1 px-4 py-3" id="main-content">
+            
+            <!-- Tab 1: 行程頁面 (天數選擇器已移到外面，畫面變超乾淨！) -->
+            <div id="tab-itinerary" class="tab-content block">
                 <!-- 每日行程列表 -->
                 <div id="itinerary-cards" class="space-y-4">
                     <!-- 這裡會動態載入景點卡片 -->
@@ -89,11 +95,12 @@
 
             <!-- Tab 2: 實用指南頁面 -->
             <div id="tab-guide" class="tab-content hidden space-y-4">
-                <!-- 每日天氣與穿搭提示 (已從行程頁完美移動至此，並支援天數連動) -->
+                
+                <!-- 💡 天氣與穿戴提示移到了這裡的最上方！並且會隨著頂端天數按鈕聰明切換 -->
                 <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-3xl p-5 shadow-sm relative overflow-hidden">
                     <div class="absolute -right-2 -bottom-2 text-5xl opacity-10">👚</div>
                     <h3 class="text-sm font-bold text-amber-900 flex items-center gap-1.5 mb-2">
-                        ✨ <span id="weather-day-label">Day 1</span> 穿著與天氣提示
+                        ✨ <span id="weather-day-label" class="font-bold">Day 1</span> 穿著與天氣提示
                     </h3>
                     <p id="weather-tip-text" class="text-xs text-amber-800 leading-relaxed">
                         載入中...
@@ -274,7 +281,7 @@
             </div>
         </div>
 
-        <!-- 韓系質感自訂確認彈窗 (已完全修復 unclosed tags 漏洞 🚀) -->
+        <!-- 韓系質感自訂確認彈窗 -->
         <div id="custom-alert-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
             <div class="bg-white rounded-3xl w-full max-w-xs p-6 shadow-2xl border border-slate-100 flex flex-col items-center text-center">
                 <span id="alert-icon" class="text-3xl mb-2">💡</span>
@@ -291,7 +298,7 @@
             </div>
         </div>
 
-        <!-- 底部固定浮動導覽條 (Glassmorphism Effect - 終於重見天日 ✨) -->
+        <!-- 底部固定浮動導覽條 (Glassmorphism Effect) -->
         <nav class="fixed bottom-5 left-4 right-4 max-w-md mx-auto bg-white/80 backdrop-blur-md border border-white/40 py-2 px-3 rounded-3xl shadow-lg flex justify-around items-center z-40">
             <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition bg-sky-50 text-sky-700">
                 <span class="text-lg">🗺️</span>
@@ -301,7 +308,6 @@
                 <span class="text-lg">🧭</span>
                 <span class="text-[10px] font-bold">指南</span>
             </button>
-            <!-- 💡 將原本「天氣記帳」正名為「記帳分帳」 -->
             <button onclick="switchTab('billing')" id="nav-billing" class="flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition text-slate-400 hover:text-slate-600">
                 <span class="text-lg">💸</span>
                 <span class="text-[10px] font-bold">記帳分帳</span>
@@ -400,7 +406,7 @@ const firebaseConfig = {
                         tag: "必出發",
                         tagColor: "bg-sky-100 text-sky-700",
                         tips: "登機前拍張機翼與藍天的合照，為旅程拉開序幕！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=金門機場",
                         parking: "金門機場有免費及付費停車場，停車方便。",
                         gas: "機場圓環旁即有中油加油站。"
                     },
@@ -412,7 +418,7 @@ const firebaseConfig = {
                         tag: "必體驗",
                         tagColor: "bg-teal-100 text-teal-700",
                         tips: "船行途中可上甲板吹吹海風，欣賞兩岸海景！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=水頭碼頭",
                         parking: "水頭碼頭備有大型收費停車場。",
                         gas: "碼頭周邊無加油站，請至金城市區加油。"
                     },
@@ -424,7 +430,7 @@ const firebaseConfig = {
                         tag: "必吃",
                         tagColor: "bg-rose-100 text-rose-700",
                         tips: "現涮牛肉麵是招牌，熱湯淋下去的瞬間一定要錄影！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=喬安牧場金門",
                         parking: "店門口設有專屬空地，開車停車完全免煩惱！",
                         gas: "鄰近金寧加油站，約 3 分鐘車程。"
                     },
@@ -436,7 +442,7 @@ const firebaseConfig = {
                         tag: "必拍",
                         tagColor: "bg-purple-100 text-purple-700",
                         tips: "沙溪堡的木棧道盡頭是拍攝對岸廈門高樓大廈的絕佳機位！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=沙溪堡",
                         parking: "各景點旁均設有免費觀光空地停車場。",
                         gas: "烈嶼僅有一家加油站（中油烈嶼站），記得留意油量。"
                     },
@@ -448,7 +454,7 @@ const firebaseConfig = {
                         tag: "必拍",
                         tagColor: "bg-amber-100 text-amber-700",
                         tips: "店門口斑駁的泥牆與老鐵窗，是韓系文青網美照的首選背景！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=膩咖啡",
                         parking: "請將車輛停放在巷口大馬路旁，再漫步走入巷內喔。",
                         gas: "烈嶼加油站就在回碼頭的順路上。"
                     },
@@ -460,7 +466,7 @@ const firebaseConfig = {
                         tag: "必吃",
                         tagColor: "bg-rose-100 text-rose-700",
                         tips: "招牌宴菜跟芋頭排骨，芋頭口感綿密到驚艷！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=喜豐樓",
                         parking: "路邊有規畫白線可以方便路邊停車。",
                         gas: "靠近金城市區中油加油站，約 2 分鐘車程。"
                     },
@@ -472,7 +478,7 @@ const firebaseConfig = {
                         tag: "必拍",
                         tagColor: "bg-purple-100 text-purple-700",
                         tips: "夜間聚落會打上暖黃燈光，拍攝得月樓全景更能展現巴洛克式雕刻立體感！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=得月樓",
                         parking: "聚落入口處有大型公共免費停車場。",
                         gas: "距離金城市區加油站約 5 分鐘車程。"
                     },
@@ -484,8 +490,8 @@ const firebaseConfig = {
                         tag: "必吃",
                         tagColor: "bg-rose-100 text-rose-700",
                         tips: "一定要點油條，沾著無米粥底吃，才是最道地的閩南吃法！",
-                        map: "https://maps.google.com",
-                        parking: "建議可將車子停在附近總兵署旁 or 金門高中停車場再散步過來。",
+                        map: "https://www.google.com/maps/search/?api=1&query=金城飯店",
+                        parking: "建議可將車子停在附近總兵署旁或金門高中停車場再散步過來。",
                         gas: "金城鎮中油加油站就在不遠處。"
                     },
                     {
@@ -496,7 +502,7 @@ const firebaseConfig = {
                         tag: "必住",
                         tagColor: "bg-blue-100 text-blue-700",
                         tips: "大廳提供金門地圖，可以跟櫃台索取一份，很有旅行儀式感！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=海福商務旅館",
                         parking: "旅館對面或路邊規劃有多個特約及公有停車格。",
                         gas: "位於金城市中心，加油超級方便。"
                     }
@@ -509,11 +515,11 @@ const firebaseConfig = {
                         time: "08:30",
                         category: "食物",
                         name: "永春廣東粥 🍲",
-                        desc: "金門傳奇名店！完全熬煮到化開、無米粒的廣東粥底，加入自製手工肉丸、豬肝，熱騰騰下肚。",
+                        desc: "金門傳奇名店！完全熬煮到化開、無米粒 of 廣東粥底，加入自製手工肉丸、豬肝，熱騰騰下肚。",
                         tag: "必吃",
                         tagColor: "bg-rose-100 text-rose-700",
                         tips: "店家對面的騎樓下拍照，拍下端著青花瓷大瓷碗熱氣裊裊的瞬間，極具生活感！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=永春廣東粥",
                         parking: "金城市區小巷多，建議車停「總兵署停車場」再步行前往。",
                         gas: "近市區中油站。"
                     },
@@ -525,7 +531,7 @@ const firebaseConfig = {
                         tag: "必拍",
                         tagColor: "bg-purple-100 text-purple-700",
                         tips: "將手機倒置、貼近水面，就能利用超廣角鏡頭，拍出完美的「天空之鏡」鏡面反射倒影！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=翟山坑道",
                         parking: "園區外設有超大型免費專屬停車場，非常好停。",
                         gas: "古崗村附近無油站，請在金城市區加滿再出發。"
                     },
@@ -537,7 +543,7 @@ const firebaseConfig = {
                         tag: "必吃",
                         tagColor: "bg-rose-100 text-rose-700",
                         tips: "海蚵酥一定要趁熱吃，石蚵雖然小顆但鮮甜爆漿！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=喜悅小館",
                         parking: "店家前馬路寬敞，路邊皆可停車。",
                         gas: "車程 5 分鐘內即有加油站。"
                     },
@@ -545,11 +551,11 @@ const firebaseConfig = {
                         time: "13:30",
                         category: "景點",
                         name: "北山古洋樓與播音牆 📣",
-                        desc: "彈痕累累的北山古洋樓見著了古寧頭戰役；巨大的播音牆則聳立在岸邊，循環播放著鄧麗君的歌聲。",
+                        desc: "彈痕累累的北山古洋樓見證了古寧頭戰役；巨大的播音牆則聳立在岸邊，循環播放著鄧麗君的歌聲。",
                         tag: "必拍",
                         tagColor: "bg-purple-100 text-purple-700",
                         tips: "站在播音牆下方巨型喇叭孔洞中間，用仰角拍攝，人顯得嬌小，構圖極具張力！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=北山播音牆",
                         parking: "播音牆與古洋樓外皆有規劃大片免費停車空間。",
                         gas: "最近加油站為中油金寧加油站。"
                     },
@@ -561,7 +567,7 @@ const firebaseConfig = {
                         tag: "必拍",
                         tagColor: "bg-amber-100 text-amber-700",
                         tips: "榻榻米座區採光極佳，側身看著木格窗戶喝茶的側面角度，超級文青！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=百花洋樓喫茶",
                         parking: "周邊聚落路旁空地可免費臨停。",
                         gas: "回程往金城市區方向皆有中油加油站。"
                     },
@@ -573,7 +579,7 @@ const firebaseConfig = {
                         tag: "必吃",
                         tagColor: "bg-rose-100 text-rose-700",
                         tips: "敢挑戰「炒沙蟲」一定要試試！口感像脆腸，拍照上傳社群絕對引發洗板！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=記得海鮮餐廳",
                         parking: "餐廳有專屬大型停車空地。",
                         gas: "金城市區中油加油站就在 3 分鐘車程內。"
                     },
@@ -585,7 +591,7 @@ const firebaseConfig = {
                         tag: "必體驗",
                         tagColor: "bg-teal-100 text-teal-700",
                         tips: "總兵署庭院中巨大的百年木棉樹，在夜間燈光下有種奇幻神祕之美，很適合拍意境照！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=清金門鎮總兵署",
                         parking: "建議將車輛停在「金門高中停車場」或「北堤停車場」步行過來。",
                         gas: "金城市區加油站。"
                     },
@@ -597,7 +603,7 @@ const firebaseConfig = {
                         tag: "必吃",
                         tagColor: "bg-rose-100 text-rose-700",
                         tips: "炒丁香魚跟炒蛤蜊是絕佳配酒菜，舉起啤酒杯跟高粱杯合照一張吧！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=大廟口熱炒",
                         parking: "周邊街區晚上白線可停車，但飲酒千萬別開車！",
                         gas: "市區加油便利。"
                     },
@@ -609,7 +615,7 @@ const firebaseConfig = {
                         tag: "必住",
                         tagColor: "bg-blue-100 text-blue-700",
                         tips: "回房前記得把相機與手機充飽電，明天有更美麗的景緻等著我們！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=海福商務旅館",
                         parking: "特約停車場。",
                         gas: "市區加油。"
                     }
@@ -626,7 +632,7 @@ const firebaseConfig = {
                         tag: "必吃",
                         tagColor: "bg-rose-100 text-rose-700",
                         tips: "雙蛋蛋餅淋上特製蒜蓉醬，拍一張橫剖面蛋汁流出的特寫，讓人垂涎三尺！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=金許園",
                         parking: "店門口附近路邊白線寬敞，可臨停靠邊。",
                         gas: "市區中油加油站。"
                     },
@@ -638,7 +644,7 @@ const firebaseConfig = {
                         tag: "必拍",
                         tagColor: "bg-purple-100 text-purple-700",
                         tips: "觀測所坑道口上方刻有「還我河山」紅色大字，站在字體下方立正拍照，特別有時代戰地幽默！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=馬山觀測所",
                         parking: "觀測所外設有大型免費公共停車場。",
                         gas: "近沙美市區中油加油站。"
                     },
@@ -650,7 +656,7 @@ const firebaseConfig = {
                         tag: "必吃",
                         tagColor: "bg-rose-100 text-rose-700",
                         tips: "店內的蚵仔麵線是用純手工日曬麵線，麵線彈牙不爛，一定要來一碗拍照打卡！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=新天地海產店",
                         parking: "店外路邊寬敞，皆可方便停車。",
                         gas: "鄰近中油沙美加油站，約 2 分鐘車程。"
                     },
@@ -662,7 +668,7 @@ const firebaseConfig = {
                         tag: "必吃",
                         tagColor: "bg-rose-100 text-rose-700",
                         tips: "將盛裝著精緻切片千層蛋糕的瓷盤，放在四合院中庭的磨石子桌上，由上往下垂直俯拍，古厝與甜點的衝突美感超吸睛！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=愜意甜點工作室",
                         parking: "請勿將車開入古聚落小巷內，建議停在外圍大馬路（沙美老街周邊）步行進入。",
                         gas: "沙美加油站就在聚落外圍。"
                     },
@@ -674,7 +680,7 @@ const firebaseConfig = {
                         tag: "必返程",
                         tagColor: "bg-sky-100 text-sky-700",
                         tips: "趁候機空檔，在機場免稅店買瓶珍貴的高粱酒當伴手禮吧！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=金門機場",
                         parking: "還車及機場停車。",
                         gas: "回機場還車前，記得在機場加油站加滿油還車。"
                     },
@@ -686,7 +692,7 @@ const firebaseConfig = {
                         tag: "必返程",
                         tagColor: "bg-sky-100 text-sky-700",
                         tips: "在飛機上俯瞰夜幕低垂的金門島與閃閃發光的夜景，默默在心裡道別：下次再來微醺漫遊！",
-                        map: "https://maps.google.com",
+                        map: "https://www.google.com/maps/search/?api=1&query=金門機場",
                         parking: "機場還車。",
                         gas: "機場加油站加油還車。"
                     }
@@ -849,9 +855,11 @@ const firebaseConfig = {
             const container = document.getElementById('itinerary-cards');
             const data = window.itineraryData[window.currentDay];
             
-            // 💡 穿搭天氣提示連動更新：將值送往指南頁的元件
-            document.getElementById('weather-day-label').textContent = `Day ${window.currentDay}`;
-            document.getElementById('weather-tip-text').textContent = data.weather;
+            // 💡 關鍵修正：同步更新「指南分頁」頂部的天氣穿戴內容與天數標籤！
+            const dayLabel = document.getElementById('weather-day-label');
+            const tipText = document.getElementById('weather-tip-text');
+            if (dayLabel) dayLabel.textContent = `Day ${window.currentDay}`;
+            if (tipText) tipText.textContent = data.weather;
 
             container.innerHTML = "";
             data.spots.forEach((spot, idx) => {
