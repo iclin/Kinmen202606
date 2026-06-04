@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微醺高粱．漫遊金門 🍶✨</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Zen Maru Gothic & Playpen Sans (手寫感) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playpen+Sans:wght@400;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Zen Maru Gothic', 'Playpen Sans', sans-serif;
+            background-color: #f2f6fa;
+        }
+        /* 韓式手寫/拍貼轉向特效 */
+        .polaroid-rotate-left {
+            transform: rotate(-3deg);
+        }
+        .polaroid-rotate-right {
+            transform: rotate(3deg);
+        }
+        /* 隱藏滾動條但保持功能 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen pb-24">
+
+    <!-- 手機外殼包覆（在桌機會居中限制寬度，在手機會完美滿版） -->
+    <div class="max-w-md mx-auto min-h-screen bg-[#f7fafc] shadow-2xl relative flex flex-col">
+        
+        <!-- 頂部卡片：Header -->
+        <header class="bg-gradient-to-b from-[#dbe9f6] to-[#f7fafc] px-6 pt-8 pb-6 rounded-b-[2.5rem] shadow-sm relative">
+            <div class="flex justify-between items-start">
+                <div>
+                    <span class="text-xs tracking-widest font-bold text-sky-700 bg-sky-100/80 px-2.5 py-1 rounded-full">KINMEN TRAVEL LOG</span>
+                    <h1 class="text-2xl font-bold text-slate-800 mt-2 tracking-wide flex items-center gap-1.5">
+                        微醺高粱．漫遊金門 🍶
+                    </h1>
+                    <p class="text-xs text-slate-500 mt-1 flex items-center gap-1 font-mono">
+                        📅 2026.06.13 - 06.15 (三日自駕遊)
+                    </p>
+                </div>
+                <!-- 狀態指示燈：本機或雲端 -->
+                <div id="cloud-status-badge" class="flex items-center gap-1.5 text-xs bg-amber-50 border border-amber-200 text-amber-700 px-3 py-1.5 rounded-full shadow-sm transition-all duration-300">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span id="cloud-status-text">📦 本機手帳</span>
+                </div>
+            </div>
+
+            <!-- 可愛手帳風格裝飾貼紙 -->
+            <div class="absolute -bottom-2 right-8 bg-[#fdf2e9] text-amber-700 text-[10px] px-3 py-1 rounded-full border border-amber-200/50 transform rotate-6 shadow-sm">
+                🚗 自駕暢遊中!
+            </div>
+            <div class="absolute top-4 right-4 text-2xl opacity-20">✈️</div>
+        </header>
+
+        <!-- 主體內容區 (Tabs 切換) -->
+        <main class="flex-1 px-4 py-4" id="main-content">
+            
+            <!-- Tab 1: 行程頁面 -->
+            <div id="tab-itinerary" class="tab-content block">
+                <!-- Day 選擇器 -->
+                <div class="flex gap-2 mb-4 bg-slate-100 p-1.5 rounded-2xl">
+                    <button onclick="switchDay(1)" id="btn-day-1" class="day-tab-btn flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white text-sky-800 shadow-sm">
+                        Day 1 🐥
+                        <span class="block text-[9px] opacity-70">06/13 (六)</span>
+                    </button>
+                    <button onclick="switchDay(2)" id="btn-day-2" class="day-tab-btn flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-500">
+                        Day 2 🌊
+                        <span class="block text-[9px] opacity-70">06/14 (日)</span>
+                    </button>
+                    <button onclick="switchDay(3)" id="btn-day-3" class="day-tab-btn flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-500">
+                        Day 3 🌾
+                        <span class="block text-[9px] opacity-70">06/15 (一)</span>
+                    </button>
+                </div>
+
+                <!-- 每日行程列表 -->
+                <div id="itinerary-cards" class="space-y-4">
+                    <!-- 這裡會動態載入景點卡片 -->
+                </div>
+
+                <!-- 每日天氣與穿搭提示 -->
+                <div class="mt-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-3xl p-5 shadow-sm relative overflow-hidden">
+                    <div class="absolute -right-2 -bottom-2 text-5xl opacity-10">👚</div>
+                    <h3 class="text-sm font-bold text-amber-900 flex items-center gap-1.5 mb-2">
+                        ✨ 每日穿著與天氣提示
+                    </h3>
+                    <p id="weather-tip-text" class="text-xs text-amber-800 leading-relaxed">
+                        載入中...
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tab 2: 實用指南頁面 -->
+            <div id="tab-guide" class="tab-content hidden space-y-4">
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
+                    <h3 class="font-bold text-base text-slate-800 mb-3 flex items-center gap-2">
+                        🚗 金門自駕超實用守則
+                    </h3>
+                    <ul class="space-y-3 text-xs text-slate-600 leading-relaxed">
+                        <li class="flex items-start gap-2">
+                            <span class="bg-sky-100 text-sky-700 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">1</span>
+                            <div>
+                                <strong>圓環禮讓規則：</strong> 金門市區與主要幹道圓環多，<strong>「環內車先行、環外車禮讓」</strong>，進入圓環一定要減速並禮讓環內車輛喔！
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="bg-sky-100 text-sky-700 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">2</span>
+                            <div>
+                                <strong>測速照相多多：</strong> 金門多數路段限速為 50 或 60 公里，且部分路口設有科技執法，小心超速罰單掃了興致！
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="bg-sky-100 text-sky-700 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">3</span>
+                            <div>
+                                <strong>高粱酒駕零容忍：</strong> 晚上聚餐喝高粱暢聊，<strong>絕對、絕對不可以開車！</strong>請叫計程車或安排好指定駕駛。
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
+                    <h3 class="font-bold text-base text-slate-800 mb-3 flex items-center gap-2">
+                        🍶 金門限定！微醺高粱推薦特調
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-rose-50/50 rounded-2xl border border-rose-100/50">
+                            <h4 class="text-xs font-bold text-rose-800 flex items-center gap-1">🍹 「金門之戀」微醺特調</h4>
+                            <p class="text-[11px] text-rose-700/90 mt-1">配方：58度高粱酒 1oz + 蘋果西打 3oz + 檸檬片。高粱的糧香被氣泡帶出，甜中帶點微辛，超級順口！</p>
+                        </div>
+                        <div class="p-3 bg-purple-50/50 rounded-2xl border border-purple-100/50">
+                            <h4 class="text-xs font-bold text-purple-800 flex items-center gap-1">🍇 「戰地紫羅蘭」調酒</h4>
+                            <p class="text-[11px] text-purple-700/90 mt-1">配方：38度高粱 1oz + 葡萄芬達 3oz + 些許冰塊。夢幻的紫色，高粱的濃烈被果香完美中和，女生最愛！</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: 天氣與記帳頁面 -->
+            <div id="tab-billing" class="tab-content hidden space-y-5">
+                
+                <!-- 記帳主面板 -->
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-base text-slate-800 flex items-center gap-1.5">
+                            💸 智慧分帳小助手 (4人同行)
+                        </h3>
+                        <span class="text-[10px] text-slate-400">WU • LIU • LEE • LIN</span>
+                    </div>
+
+                    <!-- 快速記帳表單 -->
+                    <form id="billing-form" class="space-y-3 bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
+                        <div>
+                            <label class="block text-[11px] text-slate-500 font-bold mb-1">📝 消費項目</label>
+                            <input type="text" id="bill-item" placeholder="例如：喬安牧場牛肉麵" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-sky-400 bg-white" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[11px] text-slate-500 font-bold mb-1">💰 金額 (NT$)</label>
+                                <input type="number" id="bill-amount" placeholder="金額" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-sky-400 bg-white" required>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-slate-500 font-bold mb-1">👤 付款人</label>
+                                <select id="bill-payer" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-sky-400 bg-white">
+                                    <option value="WU">WU</option>
+                                    <option value="LIU">LIU</option>
+                                    <option value="LEE">LEE</option>
+                                    <option value="LIN">LIN</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 平分對象 (複選) -->
+                        <div>
+                            <label class="block text-[11px] text-slate-500 font-bold mb-1.5 flex justify-between">
+                                <span>👥 平分對象</span>
+                                <button type="button" onclick="selectAllSplitters()" class="text-sky-600 hover:underline text-[10px]">全選</button>
+                            </label>
+                            <div class="flex gap-2">
+                                <label class="flex-1 flex items-center justify-center gap-1 bg-white border border-slate-200 p-2 rounded-xl cursor-pointer text-xs font-bold text-slate-700">
+                                    <input type="checkbox" name="splitter" value="WU" checked class="rounded accent-sky-600"> WU
+                                </label>
+                                <label class="flex-1 flex items-center justify-center gap-1 bg-white border border-slate-200 p-2 rounded-xl cursor-pointer text-xs font-bold text-slate-700">
+                                    <input type="checkbox" name="splitter" value="LIU" checked class="rounded accent-sky-600"> LIU
+                                </label>
+                                <label class="flex-1 flex items-center justify-center gap-1 bg-white border border-slate-200 p-2 rounded-xl cursor-pointer text-xs font-bold text-slate-700">
+                                    <input type="checkbox" name="splitter" value="LEE" checked class="rounded accent-sky-600"> LEE
+                                </label>
+                                <label class="flex-1 flex items-center justify-center gap-1 bg-white border border-slate-200 p-2 rounded-xl cursor-pointer text-xs font-bold text-slate-700">
+                                    <input type="checkbox" name="splitter" value="LIN" checked class="rounded accent-sky-600"> LIN
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-600 hover:to-indigo-600 text-white font-bold text-xs py-2.5 rounded-xl transition shadow-sm mt-2">
+                            ➕ 新增此筆帳目
+                        </button>
+                    </form>
+
+                    <!-- 當前帳目清單 -->
+                    <div class="mt-5">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-xs font-bold text-slate-700">📋 消費紀錄</h4>
+                            <button onclick="clearAllBills()" class="text-rose-500 hover:underline text-[10px]">清空帳目</button>
+                        </div>
+                        <div id="billing-list" class="space-y-2 max-h-48 overflow-y-auto pr-1 no-scrollbar">
+                            <!-- 帳目動態渲染 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 智慧結算清帳與報表 -->
+                <div class="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-3xl p-5 shadow-sm">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-sm text-teal-900 flex items-center gap-1">
+                            📊 最佳結帳清帳建議
+                        </h3>
+                        <button onclick="copyLineReport()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] px-3 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm">
+                            💬 複製 LINE 結帳格式
+                        </button>
+                    </div>
+
+                    <!-- 清帳建議列表 -->
+                    <div id="settlement-results" class="space-y-2">
+                        <!-- 清帳結果渲染 -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- 浮動照片牆 Modal -->
+        <div id="photo-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl border border-slate-100 flex flex-col transform scale-95 transition-all duration-300">
+                <div class="px-6 pt-6 pb-2 flex justify-between items-center">
+                    <h3 id="photo-modal-title" class="font-bold text-slate-800 text-sm">📷 上傳旅記相片</h3>
+                    <button onclick="closePhotoModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <!-- 韓式手寫風拍立得預覽框 -->
+                    <div class="bg-white border border-slate-200 rounded-lg p-3 pb-8 shadow-md transform polaroid-rotate-left flex flex-col items-center">
+                        <div id="polaroid-image-box" class="w-full aspect-[4/3] bg-slate-100 rounded border border-slate-100/50 flex flex-col items-center justify-center text-slate-400 relative overflow-hidden">
+                            <span class="text-3xl">🏞️</span>
+                            <span class="text-[10px] mt-1 text-slate-500">預覽照片</span>
+                            <img id="polaroid-img" class="absolute inset-0 w-full h-full object-cover hidden" alt="上傳預覽">
+                        </div>
+                        <div class="w-full text-center mt-3">
+                            <span id="polaroid-caption" class="text-xs font-bold text-sky-800/80 font-mono tracking-widest">KIMEN MEMORY</span>
+                        </div>
+                    </div>
+
+                    <!-- 選擇檔案按鈕 -->
+                    <div class="flex gap-2">
+                        <input type="file" id="photo-file-input" accept="image/*" class="hidden" onchange="previewUserPhoto(event)">
+                        <button onclick="document.getElementById('photo-file-input').click()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-bold transition">
+                            📂 選擇手機相片
+                        </button>
+                        <button onclick="useMockPhoto()" class="flex-1 bg-gradient-to-r from-amber-400 to-orange-400 text-white py-2.5 rounded-xl text-xs font-bold transition">
+                            ✨ 使用精選美照
+                        </button>
+                    </div>
+
+                    <button onclick="savePhotoLog()" class="w-full bg-sky-600 hover:bg-sky-700 text-white py-3 rounded-xl text-xs font-bold transition shadow-sm">
+                        💾 保存到本機旅記
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 韓系質感自訂確認彈窗 (取代 alert / confirm) -->
+        <div id="custom-alert-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-3xl w-full max-w-xs p-6 shadow-2xl border border-slate-100 flex flex-col items-center text-center">
+                <span id="alert-icon" class="text-3xl mb-2">💡</span>
+                <h4 id="alert-title" class="font-bold text-slate-800 text-sm mb-1">通知</h4>
+                <p id="alert-message" class="text-xs text-slate-500 leading-relaxed mb-4">這是一個提示訊息。</p>
+                <div class="flex gap-2 w-full">
+                    <button id="alert-cancel-btn" onclick="closeCustomAlert(false)" class="flex-1 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 hidden">
+                        取消
+                    </button>
+                    <button id="alert-confirm-btn" onclick="closeCustomAlert(true)" class="flex-1 py-2 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white">
+                        確定
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部浮動導覽條 (Glassmorphism Effect) -->
+        <nav class="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-md border border-white/40 py-2 px-3 rounded-3xl shadow-lg flex justify-around items-center z-40">
+            <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition bg-sky-50 text-sky-700">
+                <span class="text-lg">🗺️</span>
+                <span class="text-[10px] font-bold">行程</span>
+            </button>
+            <button onclick="switchTab('guide')" id="nav-guide" class="flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition text-slate-400 hover:text-slate-600">
+                <span class="text-lg">🧭</span>
+                <span class="text-[10px] font-bold">指南</span>
+            </button>
+            <button onclick="switchTab('billing')" id="nav-billing" class="flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition text-slate-400 hover:text-slate-600">
+                <span class="text-lg">💸</span>
+                <span class="text-[10px] font-bold">天氣記帳</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- Firebase 模組與資料庫核心腳本 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // =========================================================================
+        // 🍶 STEP 2: 在這裡貼上您的 FIREBASE CONFIG 金鑰！
+        // =========================================================================
+        // 請將你在 Firebase 控制台申請到的 Web App 設定檔（Config）貼在下方。
+        // 如果維持原樣，App 會自動切換為「📦 本機緩存模式」，依然可以流暢使用與記帳喔！
+        const firebaseConfig = {
+  apiKey: "AIzaSyCZiFniroFlh5yAE_LG7VSfSvE7ZCFat5I",
+  authDomain: "kinmen202606.firebaseapp.com",
+  projectId: "kinmen202606",
+  storageBucket: "kinmen202606.firebasestorage.app",
+  messagingSenderId: "1090291066732",
+  appId: "1:1090291066732:web:8d9e8f40051f6f3208b549",
+  measurementId: "G-Y615N4RRQ6"
+};
+        // =========================================================================
+
+        let db = null;
+        let auth = null;
+        let isCloudMode = false;
+        const appId = 'kinmen-travel-log';
+
+        // 檢查金鑰是否已被使用者填入
+        const hasValidKey = firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY";
+
+        if (hasValidKey) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                
+                // 執行匿名登入以取得寫入 Firestore 權限
+                signInAnonymously(auth).then(() => {
+                    isCloudMode = true;
+                    updateCloudStatus(true);
+                    initCloudSync();
+                }).catch((err) => {
+                    console.warn("Firebase 登入失敗，將自動降級為本機模式：", err);
+                    isCloudMode = false;
+                    updateCloudStatus(false);
+                    initLocalMode();
+                });
+            } catch (e) {
+                console.warn("Firebase 初始化異常，降級為本機模式：", e);
+                isCloudMode = false;
+                updateCloudStatus(false);
+                initLocalMode();
+            }
+        } else {
+            isCloudMode = false;
+            updateCloudStatus(false);
+            initLocalMode();
+        }
+
+        // 狀態標籤UI更新
+        function updateCloudStatus(connected) {
+            const badge = document.getElementById('cloud-status-badge');
+            const text = document.getElementById('cloud-status-text');
+            const dot = badge.querySelector('span');
+
+            if (connected) {
+                badge.className = "flex items-center gap-1.5 text-xs bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-1.5 rounded-full shadow-sm";
+                text.textContent = "🍶 雲端同步中";
+                dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+            } else {
+                badge.className = "flex items-center gap-1.5 text-xs bg-amber-50 border border-amber-200 text-amber-700 px-3 py-1.5 rounded-full shadow-sm";
+                text.textContent = "📦 本機手帳";
+                dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+            }
+        }
+
+        // --- 全域資料變數與三大景點資料集 ---
+        window.currentDay = 1;
+        window.currentTab = 'itinerary';
+        window.selectedSpotIndex = null;
+        
+        // 記帳紀錄陣列
+        window.bills = [];
+
+        // 景點上傳照儲存庫
+        window.photoLogs = JSON.parse(localStorage.getItem('photoLogs')) || {};
+
+        // 完整行程資料來源
+        window.itineraryData = {
+            1: {
+                weather: "☀️ 氣溫 28°C ~ 32°C • 紫外線偏強，自駕車內冷氣強，建議攜帶輕薄薄長袖防曬且防風。前往小金門吹海風超舒服，適合穿棉麻寬鬆微風系穿搭！",
+                spots: [
+                    {
+                        time: "07:50",
+                        category: "交通",
+                        name: "啟程：B7-8955 班機 ✈️",
+                        desc: "台中 RMQ 07:50 ➔ 金門 KNH 08:55。提早出門，登機證已備妥 (Ref.FM3DEP)。",
+                        tag: "必出發",
+                        tagColor: "bg-sky-100 text-sky-700",
+                        tips: "登機前拍張機翼與藍天的合照，為旅程拉開序幕！",
+                        map: "https://www.google.com/maps/search/?api=1&query=金門機場",
+                        parking: "金門機場有免費及付費停車場，停車方便。",
+                        gas: "機場圓環旁即有中油加油站。"
+                    },
+                    {
+                        time: "10:00",
+                        category: "交通",
+                        name: "馬可波羅1號 渡輪 🚢",
+                        desc: "五通碼頭 10:00 ➔ 金門碼頭 10:30。銜接前往小金門 (Ref.260512052529301)。",
+                        tag: "必體驗",
+                        tagColor: "bg-teal-100 text-teal-700",
+                        tips: "船行途中可上甲板吹吹海風，欣賞兩岸海景！",
+                        map: "https://www.google.com/maps/search/?api=1&query=水頭碼頭",
+                        parking: "水頭碼頭備有大型收費停車場。",
+                        gas: "碼頭周邊無加油站，請至金城市區加油。"
+                    },
+                    {
+                        time: "12:00",
+                        category: "食物",
+                        name: "喬安牧場 (酒糟牛餐) 🥩",
+                        desc: "品嚐金門最具代表性的酒糟牛肉，肉汁鮮甜，湯頭帶有甘甜風味，一秒喚醒味蕾。",
+                        tag: "必吃",
+                        tagColor: "bg-rose-100 text-rose-700",
+                        tips: "現涮牛肉麵是招牌，熱湯淋下去的瞬間一定要錄影！",
+                        map: "https://www.google.com/maps/search/?api=1&query=喬安牧場金門",
+                        parking: "店門口設有專屬空地，開車停車完全免煩惱！",
+                        gas: "鄰近金寧加油站，約 3 分鐘車程。"
+                    },
+                    {
+                        time: "13:30",
+                        category: "景點",
+                        name: "小金門（烈嶼）漫遊 🛵",
+                        desc: "探索離島中的離島。探訪西方社區彩繪老街、沙溪堡極西哨所，尋找傳說中的風雞守護神。",
+                        tag: "必拍",
+                        tagColor: "bg-purple-100 text-purple-700",
+                        tips: "沙溪堡的木棧道盡頭是拍攝對岸廈門高樓大廈的絕佳機位！",
+                        map: "https://www.google.com/maps/search/?api=1&query=沙溪堡",
+                        parking: "各景點旁均設有免費觀光空地停車場。",
+                        gas: "烈嶼僅有一家加油站（中油烈嶼站），記得留意油量。"
+                    },
+                    {
+                        time: "15:30",
+                        category: "食物",
+                        name: "膩咖啡 (文青老宅) ☕",
+                        desc: "小金門最溫暖的角落。隱身在巷弄與植物綠意中的老民居咖啡館，抹茶磅蛋糕香氣迷人。",
+                        tag: "必拍",
+                        tagColor: "bg-amber-100 text-amber-700",
+                        tips: "店門口斑駁的泥牆與老鐵窗，是韓系文青網美照的首選背景！",
+                        map: "https://www.google.com/maps/search/?api=1&query=膩咖啡",
+                        parking: "請將車輛停放在巷口大馬路旁，再漫步走入巷內喔。",
+                        gas: "烈嶼加油站就在回碼頭的順路上。"
+                    },
+                    {
+                        time: "18:00",
+                        category: "食物",
+                        name: "喜豐樓 (台菜饗宴) 🍲",
+                        desc: "傳承數十年的經典台菜與閩南宴席菜，熱氣騰騰的家常滋味，給一整天奔波補充滿滿能量。",
+                        tag: "必吃",
+                        tagColor: "bg-rose-100 text-rose-700",
+                        tips: "招牌宴菜跟芋頭排骨，芋頭口感綿密到驚艷！",
+                        map: "https://www.google.com/maps/search/?api=1&query=喜豐樓",
+                        parking: "路邊有規畫白線可以方便路邊停車。",
+                        gas: "靠近金城市區中油加油站，約 2 分鐘車程。"
+                    },
+                    {
+                        time: "19:30",
+                        category: "景點",
+                        name: "水頭聚落 🏰",
+                        desc: "探訪金門最華麗的洋樓與古厝群。得月樓高聳的防禦槍樓、黃輝煌洋樓的雕刻，細訴歷史滄桑。",
+                        tag: "必拍",
+                        tagColor: "bg-purple-100 text-purple-700",
+                        tips: "夜間聚落會打上暖黃燈光，拍攝得月樓全景更能展現巴洛克式雕刻立體感！",
+                        map: "https://www.google.com/maps/search/?api=1&query=得月樓",
+                        parking: "聚落入口處有大型公共免費停車場。",
+                        gas: "距離金城市區加油站約 5 分鐘車程。"
+                    },
+                    {
+                        time: "21:30",
+                        category: "食物",
+                        name: "金城飯店 (宵夜首選) 🥟",
+                        desc: "宵夜場開跑！點一碗香濃的現煮廣東粥與爆漿手工肉包，在深夜的金城街頭溫暖胃袋。",
+                        tag: "必吃",
+                        tagColor: "bg-rose-100 text-rose-700",
+                        tips: "一定要點油條，沾著無米粥底吃，才是最道地的閩南吃法！",
+                        map: "https://www.google.com/maps/search/?api=1&query=金城飯店",
+                        parking: "建議可將車子停在附近總兵署旁或金門高中停車場再散步過來。",
+                        gas: "金城鎮中油加油站就在不遠處。"
+                    },
+                    {
+                        time: "22:30",
+                        category: "酒店",
+                        name: "海福商務旅館 🏨",
+                        desc: "位於金城市區，生活機能極佳，精緻乾淨的現代房型，為明日的冒險蓄勢待發。",
+                        tag: "必住",
+                        tagColor: "bg-blue-100 text-blue-700",
+                        tips: "大廳提供金門地圖，可以跟櫃台索取一份，很有旅行儀式感！",
+                        map: "https://www.google.com/maps/search/?api=1&query=海福商務旅館",
+                        parking: "旅館對面或路邊規劃有多個特約及公有停車格。",
+                        gas: "位於金城市中心，加油超級方便。"
+                    }
+                ]
+            },
+            2: {
+                weather: "⛅ 氣溫 26°C ~ 30°C • 雲量稍多。今天要去北山海岸與翟山坑道，坑道內部較為陰涼且偶有水滴落下，建議攜帶防潑水薄外套與防滑便鞋。",
+                spots: [
+                    {
+                        time: "08:30",
+                        category: "食物",
+                        name: "永春廣東粥 🍲",
+                        desc: "金門傳奇名店！完全熬煮到化開、無米粒的廣東粥底，加入自製手工肉丸、豬肝，熱騰騰下肚。",
+                        tag: "必吃",
+                        tagColor: "bg-rose-100 text-rose-700",
+                        tips: "店家對面的騎樓下拍照，拍下端著青花瓷大瓷碗熱氣裊裊的瞬間，極具生活感！",
+                        map: "https://www.google.com/maps/search/?api=1&query=永春廣東粥",
+                        parking: "金城市區小巷多，建議車停「總兵署停車場」再步行前往。",
+                        gas: "近市區中油站。"
+                    },
+                    {
+                        time: "09:30",
+                        category: "景點",
+                        name: "翟山坑道 🌊",
+                        desc: "鬼斧神工的軍事遺跡。昔日國軍開鑿花崗岩的巨型水道，海水倒映石壁，波光粼粼如夢境。",
+                        tag: "必拍",
+                        tagColor: "bg-purple-100 text-purple-700",
+                        tips: "將手機倒置、貼近水面，就能利用超廣角鏡頭，拍出完美的「天空之鏡」鏡面反射倒影！",
+                        map: "https://www.google.com/maps/search/?api=1&query=翟山坑道",
+                        parking: "園區外設有超大型免費專屬停車場，非常好停。",
+                        gas: "古崗村附近無油站，請在金城市區加滿再出發。"
+                    },
+                    {
+                        time: "12:00",
+                        category: "食物",
+                        name: "喜悅小館 (午餐) 炒泡麵 🥢",
+                        desc: "點一盤金門戰地特色「炒泡麵」與海蚵煎，料多實在，吃得到濃濃的懷舊戰地情懷。",
+                        tag: "必吃",
+                        tagColor: "bg-rose-100 text-rose-700",
+                        tips: "海蚵酥一定要趁熱吃，石蚵雖然小顆但鮮甜爆漿！",
+                        map: "https://www.google.com/maps/search/?api=1&query=喜悅小館",
+                        parking: "店家前馬路寬敞，路邊皆可停車。",
+                        gas: "車程 5 分鐘內即有加油站。"
+                    },
+                    {
+                        time: "13:30",
+                        category: "景點",
+                        name: "北山古洋樓與播音牆 📣",
+                        desc: "彈痕累累的北山古洋樓見證了古寧頭戰役；巨大的播音牆則聳立在岸邊，循環播放著邓丽君的歌聲。",
+                        tag: "必拍",
+                        tagColor: "bg-purple-100 text-purple-700",
+                        tips: "站在播音牆下方巨型喇叭孔洞中間，用仰角拍攝，人顯得嬌小，構圖極具張力！",
+                        map: "https://www.google.com/maps/search/?api=1&query=北山播音牆",
+                        parking: "播音牆與古洋樓外皆有規劃大片免費停車空間。",
+                        gas: "最近加油站為中油金寧加油站。"
+                    },
+                    {
+                        time: "15:30",
+                        category: "食物",
+                        name: "百花洋樓喫茶 🍵",
+                        desc: "在充滿昭和復古浪漫情調的日治風格洋樓中，享用一份和果子、一杯日式煎茶，時光流轉。",
+                        tag: "必拍",
+                        tagColor: "bg-amber-100 text-amber-700",
+                        tips: "榻榻米座區採光極佳，側身看著木格窗戶喝茶的側面角度，超級文青！",
+                        map: "https://www.google.com/maps/search/?api=1&query=百花洋樓喫茶",
+                        parking: "周邊聚落路旁空地可免費臨停。",
+                        gas: "回程往金城市區方向皆有中油加油站。"
+                    },
+                    {
+                        time: "18:00",
+                        category: "食物",
+                        name: "記得海鮮餐廳 🦀",
+                        desc: "金門海鮮老店，招牌避風塘炒蟹、炒沙蟲、高粱醉雞，大火熱炒出最在地的澎湃海港味。",
+                        tag: "必吃",
+                        tagColor: "bg-rose-100 text-rose-700",
+                        tips: "敢挑戰「炒沙蟲」一定要試試！口感像脆腸，拍照上傳社群絕對引發洗板！",
+                        map: "https://www.google.com/maps/search/?api=1&query=記得海鮮餐廳",
+                        parking: "餐廳有專屬大型停車空地。",
+                        gas: "金城市區中油加油站就在 3 分鐘車程內。"
+                    },
+                    {
+                        time: "19:30",
+                        category: "活動",
+                        name: "夜間導覽 (後浦小鎮) 🏮",
+                        desc: "由在地專業導覽員帶領，漫步清總兵署、邱良功母節孝坊、模範街，細品金門月夜故事。",
+                        tag: "必體驗",
+                        tagColor: "bg-teal-100 text-teal-700",
+                        tips: "總兵署庭院中巨大的百年木棉樹，在夜間燈光下有種奇幻神祕之美，很適合拍意境照！",
+                        map: "https://www.google.com/maps/search/?api=1&query=清金門鎮總兵署",
+                        parking: "建議將車輛停在「金門高中停車場」或「北堤停車場」步行過來。",
+                        gas: "金城市區加油站。"
+                    },
+                    {
+                        time: "21:30",
+                        category: "食物",
+                        name: "大廟口熱炒 (宵夜局) 🍻",
+                        desc: "在古色古香的街角熱炒，配上一杯特調高粱，在冰涼與嗆辣之間聊著兩天的趣事，好不愜意。",
+                        tag: "必吃",
+                        tagColor: "bg-rose-100 text-rose-700",
+                        tips: "炒丁香魚跟炒蛤蜊是絕佳配酒菜，舉起啤酒杯跟高粱杯合照一張吧！",
+                        map: "https://www.google.com/maps/search/?api=1&query=大廟口熱炒",
+                        parking: "周邊街區晚上白線可停車，但飲酒千萬別開車！",
+                        gas: "市區加油便利。"
+                    },
+                    {
+                        time: "22:30",
+                        category: "酒店",
+                        name: "海福商務旅館 🏨",
+                        desc: "回到舒適安靜的被窩，整理相簿中的回憶與一整天的感動。",
+                        tag: "必住",
+                        tagColor: "bg-blue-100 text-blue-700",
+                        tips: "回房前記得把相機與手機充飽電，明天有更美麗的景緻等著我們！",
+                        map: "https://www.google.com/maps/search/?api=1&query=海福商務旅館",
+                        parking: "特約停車場。",
+                        gas: "市區加油。"
+                    }
+                ]
+            },
+            3: {
+                weather: "☀️ 氣溫 29°C ~ 33°C • 烈日當空。今日將前往馬山觀測所迎風遠眺，岸邊風大，可戴頂編織遮陽帽，既防曬又能增加造型感！",
+                spots: [
+                    {
+                        time: "08:30",
+                        category: "食物",
+                        name: "金許園 🥟",
+                        desc: "韭菜盒與手作蛋餅的極致！現桿現煎，外皮金黃酥脆，裡頭韭菜冬粉香氣四溢、多汁爆漿。",
+                        tag: "必吃",
+                        tagColor: "bg-rose-100 text-rose-700",
+                        tips: "雙蛋蛋餅淋上特製蒜蓉醬，拍一張橫剖面蛋汁流出的特寫，讓人垂涎三尺！",
+                        map: "https://www.google.com/maps/search/?api=1&query=金許園",
+                        parking: "店門口附近路邊白線寬敞，可臨停靠邊。",
+                        gas: "市區中油加油站。"
+                    },
+                    {
+                        time: "09:30",
+                        category: "景點",
+                        name: "馬山觀測站與金沙 🌾",
+                        desc: "「天下第一哨」。穿過窄小的地底坑道，在觀測所內透過望遠鏡，能清晰看見對岸的獅嶼與角嶼。",
+                        tag: "必拍",
+                        tagColor: "bg-purple-100 text-purple-700",
+                        tips: "觀測所坑道口上方刻有「還我河山」紅色大字，站在字體下方立正拍照，特別有時代戰地幽默！",
+                        map: "https://www.google.com/maps/search/?api=1&query=馬山觀測所",
+                        parking: "觀測所外設有大型免費公共停車場。",
+                        gas: "近沙美市區中油加油站。"
+                    },
+                    {
+                        time: "12:00",
+                        category: "食物",
+                        name: "新天地海產店 🐟",
+                        desc: "沙美在地人激推的低調美味，新鮮的海產大火快炒，蚵仔煎、炸魚酥、海蚵湯，鮮甜無比。",
+                        tag: "必吃",
+                        tagColor: "bg-rose-100 text-rose-700",
+                        tips: "店內的蚵仔麵線是用純手工日曬麵線，麵線彈牙不爛，一定要來一碗拍照打卡！",
+                        map: "https://www.google.com/maps/search/?api=1&query=新天地海產店",
+                        parking: "店外路邊寬敞，皆可方便停車。",
+                        gas: "鄰近中油沙美加油站，約 2 分鐘車程。"
+                    },
+                    {
+                        time: "14:00",
+                        category: "食物",
+                        name: "愜意甜點工作室 🍰",
+                        desc: "傳統與現代的夢幻交織。在百年傳統閩南四合院古厝裡，享用精緻法式千層蛋糕與水果塔。",
+                        tag: "必吃",
+                        tagColor: "bg-rose-100 text-rose-700",
+                        tips: "將盛裝著精緻切片千層蛋糕的瓷盤，放在四合院中庭的磨石子桌上，由上往下垂直俯拍（Flatlay），古厝與甜點的衝突美感超吸睛！",
+                        map: "https://www.google.com/maps/search/?api=1&query=愜意甜點工作室",
+                        parking: "請勿將車開入古聚落小巷內，建議停在外圍大馬路（沙美老街周邊）步行進入。",
+                        gas: "沙美加油站就在聚落外圍。"
+                    },
+                    {
+                        time: "16:40",
+                        category: "交通",
+                        name: "返程班機：B7-8922 ✈️",
+                        desc: "金門 KNH 16:40 ➔ 高雄 KHH 17:30 (部分團員返程 Ref.FM214Z)。",
+                        tag: "必返程",
+                        tagColor: "bg-sky-100 text-sky-700",
+                        tips: "趁候機空檔，在機場免稅店買瓶珍貴的高粱酒當伴手禮吧！",
+                        map: "https://www.google.com/maps/search/?api=1&query=金門機場",
+                        parking: "還車及機場停車。",
+                        gas: "回機場還車前，記得在機場加油站加滿油還車。"
+                    },
+                    {
+                        time: "18:20",
+                        category: "交通",
+                        name: "返程班機：B7-8962 ✈️",
+                        desc: "金門 KNH 18:20 ➔ 台中 RMQ 19:20 (其餘團員返程 Ref.FLZ9XZ)。完美收官！",
+                        tag: "必返程",
+                        tagColor: "bg-sky-100 text-sky-700",
+                        tips: "在飛機上俯瞰夜幕低垂的金門島與閃閃發光的夜景，默默在心裡道別：下次再來微醺漫遊！",
+                        map: "https://www.google.com/maps/search/?api=1&query=金門機場",
+                        parking: "機場還車。",
+                        gas: "機場加油站加油還車。"
+                    }
+                ]
+            }
+        };
+
+        // --- Firebase 即時監聽與資料串接 (實作三大原則) ---
+        
+        function initCloudSync() {
+            if (!db) return;
+            // 監聽雲端記帳數據 (遵循 RULE 1 嚴格路徑, RULE 2 絕不使用複雜 Query 以免索引錯誤)
+            const billingCollection = collection(db, 'artifacts', appId, 'public', 'data', 'expenses');
+            
+            // 雲端即時連線 (附帶錯誤回呼，確保在 Iframe 中運行穩定)
+            onSnapshot(billingCollection, (snapshot) => {
+                const cloudBills = [];
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    cloudBills.push({ id: doc.id, ...data });
+                });
+                
+                // 由 JavaScript 於本機端做排序，避免使用 Firestore 的 orderBy 導致複合索引錯誤
+                cloudBills.sort((a, b) => b.timestamp - a.timestamp);
+                window.bills = cloudBills;
+                renderBillingUI();
+            }, (err) => {
+                console.error("Firestore 即時監聽錯誤：", err);
+                isCloudMode = false;
+                updateCloudStatus(false);
+                initLocalMode();
+            });
+        }
+
+        function initLocalMode() {
+            // 從 LocalStorage 載入資料
+            window.bills = JSON.parse(localStorage.getItem('kinmen_bills')) || [];
+            renderBillingUI();
+        }
+
+        // 寫入記帳資料 (雙模支援)
+        async function saveBill(billItem) {
+            if (isCloudMode && db) {
+                try {
+                    const billingCollection = collection(db, 'artifacts', appId, 'public', 'data', 'expenses');
+                    await addDoc(billingCollection, {
+                        ...billItem,
+                        timestamp: Date.now()
+                    });
+                } catch (e) {
+                    console.error("寫入雲端失敗，改存本機：", e);
+                    saveBillToLocal(billItem);
+                }
+            } else {
+                saveBillToLocal(billItem);
+            }
+        }
+
+        function saveBillToLocal(billItem) {
+            const newBill = {
+                id: 'local_' + Date.now(),
+                ...billItem,
+                timestamp: Date.now()
+            };
+            window.bills.unshift(newBill);
+            localStorage.setItem('kinmen_bills', JSON.stringify(window.bills));
+            renderBillingUI();
+        }
+
+        // 刪除記帳資料
+        window.deleteBillItem = async function(id) {
+            showCustomAlert("⚠️ 確定要刪除這筆帳目嗎？", "刪除後資料將無法復原喔！", true, async (confirmed) => {
+                if (confirmed) {
+                    if (isCloudMode && db && !id.startsWith('local_')) {
+                        try {
+                            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id);
+                            await deleteDoc(docRef);
+                        } catch (e) {
+                            console.error("刪除雲端資料失敗：", e);
+                        }
+                    } else {
+                        window.bills = window.bills.filter(b => b.id !== id);
+                        localStorage.setItem('kinmen_bills', JSON.stringify(window.bills));
+                        renderBillingUI();
+                    }
+                }
+            });
+        };
+
+        // 清空所有記帳資料
+        window.clearAllBills = async function() {
+            showCustomAlert("🚨 確定要清空所有記帳嗎？", "這將會清除本次旅行的所有記帳紀錄！", true, async (confirmed) => {
+                if (confirmed) {
+                    if (isCloudMode && db) {
+                        // 雲端批次清空
+                        for (let b of window.bills) {
+                            if (!b.id.startsWith('local_')) {
+                                try {
+                                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'expenses', b.id));
+                                } catch (e) { console.error(e); }
+                            }
+                        }
+                    }
+                    window.bills = [];
+                    localStorage.setItem('kinmen_bills', JSON.stringify([]));
+                    renderBillingUI();
+                    showCustomAlert("✨ 已全部清空", "讓我們重新開始「金」打細算吧！", false);
+                }
+            });
+        };
+
+        // --- 自定義可愛 Alert 邏輯 ---
+        let alertCallback = null;
+        window.showCustomAlert = function(title, msg, isConfirm = false, callback = null) {
+            const modal = document.getElementById('custom-alert-modal');
+            const alertTitle = document.getElementById('alert-title');
+            const alertMsg = document.getElementById('alert-message');
+            const cancelBtn = document.getElementById('alert-cancel-btn');
+            const confirmBtn = document.getElementById('alert-confirm-btn');
+
+            alertTitle.textContent = title;
+            alertMsg.textContent = msg;
+            alertCallback = callback;
+
+            if (isConfirm) {
+                cancelBtn.classList.remove('hidden');
+                confirmBtn.textContent = "確定";
+            } else {
+                cancelBtn.classList.add('hidden');
+                confirmBtn.textContent = "好";
+            }
+
+            modal.classList.remove('hidden');
+        };
+
+        window.closeCustomAlert = function(result) {
+            const modal = document.getElementById('custom-alert-modal');
+            modal.classList.add('hidden');
+            if (alertCallback) {
+                alertCallback(result);
+                alertCallback = null;
+            }
+        };
+
+        // --- Tab 切換與 Day 切換控制 ---
+        window.switchTab = function(tabName) {
+            window.currentTab = tabName;
+            
+            // 隱藏所有
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('nav button').forEach(el => {
+                el.classList.remove('bg-sky-50', 'text-sky-700');
+                el.classList.add('text-slate-400');
+            });
+
+            // 顯示目標
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            activeNav.classList.add('bg-sky-50', 'text-sky-700');
+            activeNav.classList.remove('text-slate-400');
+        };
+
+        window.switchDay = function(dayNum) {
+            window.currentDay = dayNum;
+            document.querySelectorAll('.day-tab-btn').forEach(btn => {
+                btn.className = "day-tab-btn flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-500";
+            });
+            const activeBtn = document.getElementById(`btn-day-${dayNum}`);
+            activeBtn.className = "day-tab-btn flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white text-sky-800 shadow-sm";
+            
+            renderItinerary();
+        };
+
+        // --- 景點卡片渲染 ---
+        function renderItinerary() {
+            const container = document.getElementById('itinerary-cards');
+            const data = window.itineraryData[window.currentDay];
+            
+            // 天氣提示文字
+            document.getElementById('weather-tip-text').textContent = data.weather;
+
+            container.innerHTML = "";
+            data.spots.forEach((spot, idx) => {
+                // 檢查是否有儲存旅記相片
+                const photoKey = `${window.currentDay}_${idx}`;
+                const savedPhoto = window.photoLogs[photoKey];
+
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-[2rem] p-5 shadow-sm border border-slate-100 space-y-3 relative overflow-hidden";
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold font-mono text-sky-600 bg-sky-50 px-2.5 py-0.5 rounded-md">${spot.time}</span>
+                            <span class="text-xs text-slate-400">•</span>
+                            <span class="text-[10px] font-bold text-slate-500">${spot.category}</span>
+                        </div>
+                        <span class="text-xs font-bold ${spot.tagColor} px-2.5 py-1 rounded-full">${spot.tag}</span>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1">${spot.name}</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed mt-1">${spot.desc}</p>
+                    </div>
+
+                    <!-- 必吃必拍Tips -->
+                    <div class="p-3 bg-amber-50/40 rounded-2xl border border-amber-100/50 text-[11px] text-slate-600 leading-relaxed">
+                        💡 <strong>拍照秘訣：</strong>${spot.tips}
+                    </div>
+
+                    <!-- 自駕油箱與停車指引 -->
+                    <div class="grid grid-cols-2 gap-2 text-[10px]">
+                        <div class="bg-blue-50/50 p-2.5 rounded-xl border border-blue-100/40">
+                            🅿️ <strong>自駕停車：</strong><span class="text-slate-500">${spot.parking}</span>
+                        </div>
+                        <div class="bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-100/40">
+                            ⛽ <strong>自駕加油：</strong><span class="text-slate-500">${spot.gas}</span>
+                        </div>
+                    </div>
+
+                    <!-- 旅記相片牆展示區 -->
+                    <div id="photo-log-display-${window.currentDay}-${idx}" class="photo-log-box ${savedPhoto ? 'block' : 'hidden'} mt-3">
+                        <div class="bg-white border border-slate-200 rounded-lg p-2.5 pb-6 shadow-sm transform polaroid-rotate-right flex flex-col items-center max-w-[200px] mx-auto relative group">
+                            <button onclick="deletePhotoLog(${window.currentDay}, ${idx})" class="absolute top-1 right-1 bg-red-500/80 hover:bg-red-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold opacity-0 group-hover:opacity-100 transition">&times;</button>
+                            <img src="${savedPhoto || ''}" class="w-full aspect-[4/3] object-cover rounded border border-slate-100" alt="旅記照片">
+                            <span class="text-[9px] font-bold text-slate-400 mt-2 tracking-widest font-mono">KINMEN MEMORY</span>
+                        </div>
+                    </div>
+
+                    <!-- 互動按鈕組 -->
+                    <div class="flex gap-2 pt-1">
+                        <a href="${spot.map}" target="_blank" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-bold text-center transition flex items-center justify-center gap-1">
+                            🗺️ Google Maps 導航
+                        </a>
+                        <button onclick="openPhotoModal(${window.currentDay}, ${idx})" class="flex-1 bg-sky-600 hover:bg-sky-700 text-white py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
+                            📷 上傳旅記相片
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- 旅記相片牆上傳與模擬美照系統 ---
+        window.openPhotoModal = function(day, spotIdx) {
+            window.selectedSpotIndex = { day, spotIdx };
+            const spot = window.itineraryData[day].spots[spotIdx];
+            document.getElementById('photo-modal-title').textContent = `📷 記錄：${spot.name}`;
+            document.getElementById('polaroid-caption').textContent = spot.name.slice(0, 15);
+            
+            // 清除之前的預覽
+            document.getElementById('polaroid-img').classList.add('hidden');
+            document.getElementById('polaroid-image-box').querySelector('span:first-child').style.display = 'block';
+            document.getElementById('photo-file-input').value = "";
+
+            document.getElementById('photo-modal').classList.remove('hidden');
+        };
+
+        window.closePhotoModal = function() {
+            document.getElementById('photo-modal').classList.add('hidden');
+        };
+
+        // 當使用者真正從手機挑選照片
+        window.previewUserPhoto = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('polaroid-img');
+                img.src = e.target.result;
+                img.classList.remove('hidden');
+                document.getElementById('polaroid-image-box').querySelector('span:first-child').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        };
+
+        // 幫懶得拍照的旅人隨機生成金門精選模擬美照 (手繪感)
+        window.useMockPhoto = function() {
+            // 使用富有金門浪漫色彩的韓系色塊與風景模擬 SVG data-uri
+            const colors = ['#f9d5e5', '#eeac99', '#e0b3e7', '#b8e0d2', '#d6e5fa'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+                <rect width="100%" height="100%" fill="${randomColor}"/>
+                <circle cx="200" cy="150" r="70" fill="#fff" opacity="0.6"/>
+                <path d="M 50 250 L 150 120 L 250 250" fill="#e8a7a1" opacity="0.8"/>
+                <path d="M 180 250 L 280 150 L 380 250" fill="#9bc4e2" opacity="0.8"/>
+                <text x="20" y="50" font-family="'Zen Maru Gothic', sans-serif" font-weight="bold" fill="#333" font-size="24">🍶 微醺金門行</text>
+            </svg>`;
+            const base64Svg = btoa(unescape(encodeURIComponent(svgStr)));
+            const mockUrl = `data:image/svg+xml;base64,${base64Svg}`;
+
+            const img = document.getElementById('polaroid-img');
+            img.src = mockUrl;
+            img.classList.remove('hidden');
+            document.getElementById('polaroid-image-box').querySelector('span:first-child').style.display = 'none';
+        };
+
+        window.savePhotoLog = function() {
+            const img = document.getElementById('polaroid-img');
+            if (img.classList.contains('hidden') || !img.src) {
+                showCustomAlert("⚠️ 請先挑選或生成一張美照喔！", "", false);
+                return;
+            }
+
+            const { day, spotIdx } = window.selectedSpotIndex;
+            const photoKey = `${day}_${spotIdx}`;
+            
+            // 存入全域並同步 LocalStorage
+            window.photoLogs[photoKey] = img.src;
+            localStorage.setItem('photoLogs', JSON.stringify(window.photoLogs));
+
+            closePhotoModal();
+            renderItinerary();
+            showCustomAlert("🌈 照片記錄成功！", "快看！景點底下出現了拍立得手帳貼紙囉！", false);
+        };
+
+        window.deletePhotoLog = function(day, spotIdx) {
+            event.stopPropagation(); // 防止點擊觸發上層
+            showCustomAlert("📝 確定要拔掉這張拍立得照片嗎？", "", true, (confirmed) => {
+                if (confirmed) {
+                    const photoKey = `${day}_${spotIdx}`;
+                    delete window.photoLogs[photoKey];
+                    localStorage.setItem('photoLogs', JSON.stringify(window.photoLogs));
+                    renderItinerary();
+                }
+            });
+        };
+
+        // --- 智慧記帳分帳核心邏輯 ---
+        
+        // 全選平分者 toggle
+        window.selectAllSplitters = function() {
+            const checkboxes = document.getElementsByName('splitter');
+            const allChecked = Array.from(checkboxes).every(c => c.checked);
+            checkboxes.forEach(c => c.checked = !allChecked);
+        };
+
+        // 新增帳目提交
+        document.getElementById('billing-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const item = document.getElementById('bill-item').value.trim();
+            const amount = parseFloat(document.getElementById('bill-amount').value);
+            const payer = document.getElementById('bill-payer').value;
+            
+            const splitters = [];
+            document.getElementsByName('splitter').forEach(cb => {
+                if (cb.checked) splitters.push(cb.value);
+            });
+
+            if (splitters.length === 0) {
+                showCustomAlert("⚠️ 請至少選擇一個要平分的人！", "", false);
+                return;
+            }
+
+            const billItem = {
+                item,
+                amount,
+                payer,
+                splitters,
+                date: new Date().toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' })
+            };
+
+            await saveBill(billItem);
+
+            // 表單重置
+            document.getElementById('bill-item').value = "";
+            document.getElementById('bill-amount').value = "";
+            
+            showCustomAlert("💸 記帳成功！", `成功加入一筆：${item} $${amount}`, false);
+        });
+
+        // 渲染記帳與清帳清單
+        function renderBillingUI() {
+            const listContainer = document.getElementById('billing-list');
+            listContainer.innerHTML = "";
+
+            if (window.bills.length === 0) {
+                listContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">目前還沒有人花錢喔！點選上方按鈕開始記帳吧 💸</p>`;
+                renderSettlement([]);
+                return;
+            }
+
+            window.bills.forEach((bill) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "flex justify-between items-center bg-slate-50 hover:bg-slate-100 p-3 rounded-2xl border border-slate-100/50 transition duration-150 text-xs";
+                itemDiv.innerHTML = `
+                    <div class="space-y-0.5">
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-bold text-slate-700">${bill.item}</span>
+                            <span class="text-[9px] bg-slate-200/80 text-slate-500 px-1.5 py-0.5 rounded-full">${bill.date}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400">
+                            👤 <strong class="text-slate-600">${bill.payer}</strong> 付款，由 ${bill.splitters.join(', ')} 平分
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800 font-mono">NT$ ${bill.amount}</span>
+                        <button onclick="deleteBillItem('${bill.id}')" class="text-rose-400 hover:text-rose-600 font-bold px-1.5 py-1 text-base">&times;</button>
+                    </div>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+
+            // 計算最佳分帳
+            calculateSettlement();
+        }
+
+        // 核心：清帳簡化演算法 (Minimum Cash Flow)
+        function calculateSettlement() {
+            const members = ['WU', 'LIU', 'LEE', 'LIN'];
+            const balances = { 'WU': 0, 'LIU': 0, 'LEE': 0, 'LIN': 0 };
+
+            // 1. 計算每個人在此行中的淨餘額 (收回的錢 - 該付的錢)
+            window.bills.forEach(bill => {
+                const payer = bill.payer;
+                const amount = bill.amount;
+                const splitters = bill.splitters;
+                const share = amount / splitters.length;
+
+                // 付款人先墊這筆錢
+                balances[payer] += amount;
+
+                // 參與平分的人扣除他們應付的份额
+                splitters.forEach(member => {
+                    balances[member] -= share;
+                });
+            });
+
+            // 2. 匹配債務人與債權人
+            const debts = [];
+            
+            // 遞迴簡化轉帳
+            function resolveDebts() {
+                // 找出最大債務人 (負最多) 與最大債權人 (正最多)
+                let minUser = 'WU', maxUser = 'WU';
+                let minVal = 0, maxVal = 0;
+
+                members.forEach(m => {
+                    if (balances[m] < minVal) {
+                        minVal = balances[m];
+                        minUser = m;
+                    }
+                    if (balances[m] > maxVal) {
+                        maxVal = balances[m];
+                        maxUser = m;
+                    }
+                });
+
+                // 如果所有餘額皆趨近於0，表示清帳完成
+                if (Math.abs(minVal) < 0.01 && Math.abs(maxVal) < 0.01) {
+                    return;
+                }
+
+                // 決定轉帳金額 (兩者絕對值較小的那一個)
+                const transferAmount = Math.min(Math.abs(minVal), maxVal);
+                
+                // 記錄這一筆轉帳
+                debts.push({
+                    from: minUser,
+                    to: maxUser,
+                    amount: Math.round(transferAmount)
+                });
+
+                // 更新餘額
+                balances[minUser] += transferAmount;
+                balances[maxUser] -= transferAmount;
+
+                // 繼續下一輪匹配
+                resolveDebts();
+            }
+
+            resolveDebts();
+            renderSettlement(debts);
+        }
+
+        function renderSettlement(debts) {
+            const container = document.getElementById('settlement-results');
+            container.innerHTML = "";
+
+            if (debts.length === 0) {
+                container.innerHTML = `<p class="text-xs text-teal-800/70 text-center py-4">完美平衡！目前沒有任何人欠任何人錢喔 🎉</p>`;
+                return;
+            }
+
+            debts.forEach(debt => {
+                const card = document.createElement('div');
+                card.className = "flex justify-between items-center bg-white border border-teal-100 p-3 rounded-2xl shadow-sm text-xs";
+                card.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-[10px]">${debt.from}</span>
+                        <span class="text-slate-400">👉 轉帳給</span>
+                        <span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-[10px]">${debt.to}</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 mr-1">應付</span>
+                        <span class="font-bold text-teal-800 font-mono text-sm">NT$ ${debt.amount}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 一鍵複製 LINE 結帳格式
+        window.copyLineReport = function() {
+            if (window.bills.length === 0) {
+                showCustomAlert("⚠️ 目前還沒有任何記帳紀錄喔！", "", false);
+                return;
+            }
+
+            // 重新計算結算來生成文字
+            const members = ['WU', 'LIU', 'LEE', 'LIN'];
+            const balances = { 'WU': 0, 'LIU': 0, 'LEE': 0, 'LIN': 0 };
+
+            window.bills.forEach(bill => {
+                const payer = bill.payer;
+                const amount = bill.amount;
+                const splitters = bill.splitters;
+                const share = amount / splitters.length;
+                balances[payer] += amount;
+                splitters.forEach(member => { balances[member] -= share; });
+            });
+
+            const debts = [];
+            function resolveDebts() {
+                let minUser = 'WU', maxUser = 'WU';
+                let minVal = 0, maxVal = 0;
+                members.forEach(m => {
+                    if (balances[m] < minVal) { minVal = balances[m]; minUser = m; }
+                    if (balances[m] > maxVal) { maxVal = balances[m]; maxUser = m; }
+                });
+                if (Math.abs(minVal) < 0.01 && Math.abs(maxVal) < 0.01) return;
+                const transferAmount = Math.min(Math.abs(minVal), maxVal);
+                debts.push({ from: minUser, to: maxUser, amount: Math.round(transferAmount) });
+                balances[minUser] += transferAmount;
+                balances[maxUser] -= transferAmount;
+                resolveDebts();
+            }
+            resolveDebts();
+
+            let reportText = `🍶 【微醺高粱．漫遊金門】結帳小報表 ✨\n`;
+            reportText += `---------------------------\n`;
+            reportText += `📋 總計消費筆數：${window.bills.length} 筆\n\n`;
+            reportText += `💰 轉帳最優化方案：\n`;
+            
+            if (debts.length === 0) {
+                reportText += `大家均分完美！無須額外轉帳喔 🎉\n`;
+            } else {
+                debts.forEach(d => {
+                    reportText += `💸 【${d.from}】 ➔ 匯款給 【${d.to}】 $${d.amount} 元\n`;
+                });
+            }
+            reportText += `---------------------------\n`;
+            reportText += `快去完成轉帳，讓我們繼續喝高粱慶祝吧！🍻🚗`;
+
+            // 使用傳統複製API以防止安全限制
+            const textarea = document.createElement('textarea');
+            textarea.value = reportText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            showCustomAlert("🍀 複製成功！", "LINE 格式結帳報表已複製到剪貼簿，直接貼到群組即可！", false);
+        };
+
+        // 頁面初始化
+        window.onload = function() {
+            switchDay(1);
+        };
+
+    </script>
+</body>
+</html>
