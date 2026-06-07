@@ -35,7 +35,6 @@
 <!-- pb-36 徹底解放底部空間，防止被浮動導覽條遮擋 -->
 <body class="text-slate-800 antialiased min-h-screen pb-36">
 
-    <!-- 手機外殼包覆（在桌機會居中限制寬度，在手機會完美滿版） -->
     <div class="max-w-md mx-auto min-h-screen bg-[#f7fafc] shadow-2xl relative flex flex-col">
         
         <!-- 頂部卡片：Header (pt-10 防止 iPhone 時間與網頁疊加) -->
@@ -64,7 +63,6 @@
             <div class="absolute top-4 right-4 text-2xl opacity-20">✈️</div>
         </header>
 
-        <!-- 💡 核心亮點：將 Day 選擇器移至頂層（Global），讓行程與天氣指南都能完美同步連動！ -->
         <div class="px-4 pt-4 pb-1">
             <div class="flex gap-2 bg-slate-100 p-1.5 rounded-2xl shadow-inner">
                 <button onclick="switchDay(1)" id="btn-day-1" class="day-tab-btn flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-white text-sky-800 shadow-sm">
@@ -85,7 +83,6 @@
         <!-- 主體內容區 (Tabs 切換) -->
         <main class="flex-1 px-4 py-3" id="main-content">
             
-            <!-- Tab 1: 行程頁面 (天數選擇器已移到外面，畫面變超乾淨！) -->
             <div id="tab-itinerary" class="tab-content block">
                 <!-- 每日行程列表 -->
                 <div id="itinerary-cards" class="space-y-4">
@@ -93,16 +90,18 @@
                 </div>
             </div>
 
-            <!-- Tab 2: 實用指南頁面 -->
             <div id="tab-guide" class="tab-content hidden space-y-4">
                 
-                <!-- 💡 天氣與穿戴提示移到了這裡的最上方！並且會隨著頂端天數按鈕聰明切換 -->
+                <!-- 天氣與穿戴提示（連動切換且支援即時編輯 ✏️） -->
                 <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-3xl p-5 shadow-sm relative overflow-hidden">
                     <div class="absolute -right-2 -bottom-2 text-5xl opacity-10">👚</div>
+                    <button onclick="openEditWeatherModal()" class="absolute top-4 right-4 text-[10px] bg-amber-200/85 hover:bg-amber-300 text-amber-900 px-2.5 py-1 rounded-full font-bold transition-all shrink-0">
+                        ✏️ 編輯
+                    </button>
                     <h3 class="text-sm font-bold text-amber-900 flex items-center gap-1.5 mb-2">
                         ✨ <span id="weather-day-label" class="font-bold">Day 1</span> 穿著與天氣提示
                     </h3>
-                    <p id="weather-tip-text" class="text-xs text-amber-800 leading-relaxed">
+                    <p id="weather-tip-text" class="text-xs text-amber-800 leading-relaxed pr-10">
                         載入中...
                     </p>
                 </div>
@@ -150,7 +149,6 @@
                 </div>
             </div>
 
-            <!-- Tab 3: 記帳分帳頁面 -->
             <div id="tab-billing" class="tab-content hidden space-y-5">
                 
                 <!-- 記帳主面板 -->
@@ -281,6 +279,83 @@
             </div>
         </div>
 
+        <!-- 💡 行程編輯 Modal -->
+        <div id="edit-spot-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl border border-slate-100 flex flex-col transform scale-95 transition-all duration-300 max-h-[90vh]">
+                <div class="px-6 pt-6 pb-2 flex justify-between items-center shrink-0 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">✏️ 編輯行程內容</h3>
+                    <button onclick="closeEditSpotModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+                </div>
+                <div class="p-6 space-y-4 overflow-y-auto no-scrollbar">
+                    <div>
+                        <label class="block text-[11px] text-slate-500 font-bold mb-1">⏱️ 時間</label>
+                        <input type="text" id="edit-spot-time" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-sky-400 bg-slate-50" />
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-500 font-bold mb-1">🏷️ 分類</label>
+                        <select id="edit-spot-category" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-sky-400 bg-slate-50">
+                            <option value="交通">交通 🚢✈️</option>
+                            <option value="食物">食物 🍲🥩</option>
+                            <option value="景點">景點 🏰🌊</option>
+                            <option value="酒店">酒店 🏨🏡</option>
+                            <option value="活動">活動 🏮🎨</option>
+                            <option value="購物">購物 🛍️🌾</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-500 font-bold mb-1">📍 景點/項目名稱</label>
+                        <input type="text" id="edit-spot-name" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-sky-400 bg-slate-50" />
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-500 font-bold mb-1">📝 描述細節</label>
+                        <textarea id="edit-spot-desc" rows="3" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-sky-400 bg-slate-50 resize-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-500 font-bold mb-1">💡 拍照秘訣</label>
+                        <input type="text" id="edit-spot-tips" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-sky-400 bg-slate-50" />
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[11px] text-slate-500 font-bold mb-1">🅿️ 自駕停車</label>
+                            <input type="text" id="edit-spot-parking" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-sky-400 bg-slate-50" />
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-500 font-bold mb-1">⛽ 最近加油</label>
+                            <input type="text" id="edit-spot-gas" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-sky-400 bg-slate-50" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-500 font-bold mb-1">🎯 特色標籤 (如: 必吃, 必拍)</label>
+                        <input type="text" id="edit-spot-tag" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-sky-400 bg-slate-50" />
+                    </div>
+                </div>
+                <div class="p-4 bg-slate-50 border-t border-slate-100 flex gap-2 shrink-0">
+                    <button onclick="closeEditSpotModal()" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 transition">取消</button>
+                    <button onclick="saveSpotChanges()" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white transition shadow-sm">💾 儲存修改</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 💡 天氣編輯 Modal -->
+        <div id="edit-weather-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl border border-slate-100 flex flex-col transform scale-95 transition-all duration-300">
+                <div class="px-6 pt-6 pb-2 flex justify-between items-center shrink-0 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">👚 編輯天氣穿搭提示</h3>
+                    <button onclick="closeEditWeatherModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-[11px] text-slate-500 font-bold mb-1.5" id="weather-edit-title">Day 1 天氣穿著提示</label>
+                        <textarea id="edit-weather-text" rows="5" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-sky-400 bg-slate-50 resize-none" placeholder="輸入穿戴建議與天氣說明..."></textarea>
+                    </div>
+                </div>
+                <div class="p-4 bg-slate-50 border-t border-slate-100 flex gap-2 shrink-0">
+                    <button onclick="closeEditWeatherModal()" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 transition">取消</button>
+                    <button onclick="saveWeatherChanges()" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white transition shadow-sm">💾 儲存修改</button>
+                </div>
+            </div>
+        </div>
+
         <!-- 韓系質感自訂確認彈窗 -->
         <div id="custom-alert-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
             <div class="bg-white rounded-3xl w-full max-w-xs p-6 shadow-2xl border border-slate-100 flex flex-col items-center text-center">
@@ -319,7 +394,7 @@
     <!-- Firebase 模組與資料庫核心腳本 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         // =========================================================================
@@ -354,6 +429,7 @@ const firebaseConfig = {
                     isCloudMode = true;
                     updateCloudStatus(true);
                     initCloudSync();
+                    initItineraryCloudSync(); // 啟用行程雲端同步監聽
                 }).catch((err) => {
                     console.warn("Firebase 登入失敗，自動降級為本機模式：", err);
                     isCloudMode = false;
@@ -461,14 +537,14 @@ const firebaseConfig = {
                     {
                         time: "18:00",
                         category: "食物",
-                        name: "喜豐樓 (台菜饗宴) 🍲",
-                        desc: "傳承數十年的經典台菜與閩南宴席菜，熱氣騰騰的家常滋味，給一整天奔波補充滿滿能量。",
+                        name: "喜悅小館 (晚餐) 炒泡麵 🥢",
+                        desc: "點一盤金門戰地特色「炒泡麵」與海蚵煎，料多實在，吃得到濃濃的懷舊戰地情懷。",
                         tag: "必吃",
                         tagColor: "bg-rose-100 text-rose-700",
-                        tips: "招牌宴菜跟芋頭排骨，芋頭口感綿密到驚艷！",
-                        map: "https://www.google.com/maps/search/?api=1&query=喜豐樓",
-                        parking: "路邊有規畫白線可以方便路邊停車。",
-                        gas: "靠近金城市區中油加油站，約 2 分鐘車程。"
+                        tips: "海蚵酥一定要趁熱吃，石蚵雖然小顆但鮮甜爆漿！",
+                        map: "https://www.google.com/maps/search/?api=1&query=喜悅小館",
+                        parking: "店家前馬路寬敞，路邊皆可停車。",
+                        gas: "車程 5 分鐘內即有加油站。"
                     },
                     {
                         time: "19:30",
@@ -538,14 +614,14 @@ const firebaseConfig = {
                     {
                         time: "12:00",
                         category: "食物",
-                        name: "喜悅小館 (午餐) 炒泡麵 🥢",
-                        desc: "點一盤金門戰地特色「炒泡麵」與海蚵煎，料多實在，吃得到濃濃的懷舊戰地情懷。",
+                        name: "喜豐樓 (台菜午宴) 🍲",
+                        desc: "傳承數十年的經典台菜與閩南宴席菜，熱氣騰騰的家常滋味，給一整天奔波補充滿滿能量。",
                         tag: "必吃",
                         tagColor: "bg-rose-100 text-rose-700",
-                        tips: "海蚵酥一定要趁熱吃，石蚵雖然小顆但鮮甜爆漿！",
-                        map: "https://www.google.com/maps/search/?api=1&query=喜悅小館",
-                        parking: "店家前馬路寬敞，路邊皆可停車。",
-                        gas: "車程 5 分鐘內即有加油站。"
+                        tips: "招牌宴菜跟芋頭排骨，芋頭口感綿密到驚艷！",
+                        map: "https://www.google.com/maps/search/?api=1&query=喜豐樓",
+                        parking: "路邊有規畫白線可以方便路邊停車。",
+                        gas: "靠近金城市區中油加油站，約 2 分鐘車程。"
                     },
                     {
                         time: "13:30",
@@ -628,7 +704,7 @@ const firebaseConfig = {
                         time: "08:30",
                         category: "食物",
                         name: "金許園 🥟",
-                        desc: "韭菜盒與手作蛋餅的極致！現桿現煎，外皮金黃酥脆，裡頭韭菜冬粉香氣四溢、多汁爆漿。",
+                        desc: "現桿現煎，外皮金黃酥脆，裡頭韭菜冬粉香氣四溢、多汁爆漿。",
                         tag: "必吃",
                         tagColor: "bg-rose-100 text-rose-700",
                         tips: "雙蛋蛋餅淋上特製蒜蓉醬，拍一張橫剖面蛋汁流出的特寫，讓人垂涎三尺！",
@@ -699,6 +775,50 @@ const firebaseConfig = {
                 ]
             }
         };
+
+        // 優先讀取 Local 紀錄
+        const localItinerary = localStorage.getItem('kinmen_itinerary');
+        if (localItinerary) {
+            try {
+                window.itineraryData = JSON.parse(localItinerary);
+            } catch (e) { console.warn(e); }
+        }
+
+        // 行程雲端同步監聽器
+        function initItineraryCloudSync() {
+            if (!db) return;
+            const itineraryCol = collection(db, 'artifacts', appId, 'public', 'data', 'itinerary');
+            onSnapshot(itineraryCol, (snapshot) => {
+                snapshot.forEach((doc) => {
+                    const dayId = doc.id; // "day_1", "day_2", "day_3"
+                    const dayNum = parseInt(dayId.replace('day_', ''));
+                    if (window.itineraryData[dayNum]) {
+                        const data = doc.data();
+                        if (data.spots) window.itineraryData[dayNum].spots = data.spots;
+                        if (data.weather) window.itineraryData[dayNum].weather = data.weather;
+                    }
+                });
+                renderItinerary();
+            });
+        }
+
+        // 保存/同步行程變更至 Local & Firebase 雲端
+        async function persistItineraryChanges(day) {
+            localStorage.setItem('kinmen_itinerary', JSON.stringify(window.itineraryData));
+            renderItinerary();
+
+            if (isCloudMode && db) {
+                try {
+                    const dayDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'itinerary', 'day_' + day);
+                    await setDoc(dayDocRef, {
+                        spots: window.itineraryData[day].spots,
+                        weather: window.itineraryData[day].weather
+                    });
+                } catch (e) {
+                    console.error("雲端同步行程失敗：", e);
+                }
+            }
+        }
 
         function initCloudSync() {
             if (!db) return;
@@ -855,7 +975,7 @@ const firebaseConfig = {
             const container = document.getElementById('itinerary-cards');
             const data = window.itineraryData[window.currentDay];
             
-            // 💡 關鍵修正：同步更新「指南分頁」頂部的天氣穿戴內容與天數標籤！
+            // 同步更新指南分頁
             const dayLabel = document.getElementById('weather-day-label');
             const tipText = document.getElementById('weather-tip-text');
             if (dayLabel) dayLabel.textContent = `Day ${window.currentDay}`;
@@ -876,7 +996,7 @@ const firebaseConfig = {
                             <span class="text-xs text-slate-400">•</span>
                             <span class="text-[10px] font-bold text-slate-500">${spot.category}</span>
                         </div>
-                        <span class="text-xs font-bold ${spot.tagColor} px-2.5 py-1 rounded-full">${spot.tag}</span>
+                        <span class="text-xs font-bold ${spot.tagColor || 'bg-rose-100 text-rose-700'} px-2.5 py-1 rounded-full">${spot.tag}</span>
                     </div>
 
                     <div>
@@ -905,18 +1025,87 @@ const firebaseConfig = {
                         </div>
                     </div>
 
+                    <!-- 3顆按鈕：導航、相簿、編輯協同 ✏️ -->
                     <div class="flex gap-2 pt-1">
-                        <a href="${spot.map}" target="_blank" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-bold text-center transition flex items-center justify-center gap-1">
-                            🗺️ Google Maps 導航
+                        <a href="${spot.map}" target="_blank" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-[11px] font-bold text-center transition flex items-center justify-center gap-1">
+                            🗺️ 導航
                         </a>
-                        <button onclick="openPhotoModal(${window.currentDay}, ${idx})" class="flex-1 bg-sky-600 hover:bg-sky-700 text-white py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
-                            📷 上傳旅記相片
+                        <button onclick="openPhotoModal(${window.currentDay}, ${idx})" class="flex-1 bg-sky-50 hover:bg-sky-100 text-sky-700 py-2.5 rounded-xl text-[11px] font-bold transition flex items-center justify-center gap-1">
+                            📷 照片
+                        </button>
+                        <button onclick="openEditSpotModal(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2.5 rounded-xl text-[11px] font-bold transition flex items-center justify-center gap-1">
+                            ✏️ 編輯
                         </button>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
+
+        // 行程編輯 Modal 開關與保存
+        let editSpotIdx = null;
+        window.openEditSpotModal = function(idx) {
+            editSpotIdx = idx;
+            const spot = window.itineraryData[window.currentDay].spots[idx];
+            
+            document.getElementById('edit-spot-time').value = spot.time || "";
+            document.getElementById('edit-spot-category').value = spot.category || "景點";
+            document.getElementById('edit-spot-name').value = spot.name || "";
+            document.getElementById('edit-spot-desc').value = spot.desc || "";
+            document.getElementById('edit-spot-tips').value = spot.tips || "";
+            document.getElementById('edit-spot-parking').value = spot.parking || "";
+            document.getElementById('edit-spot-gas').value = spot.gas || "";
+            document.getElementById('edit-spot-tag').value = spot.tag || "";
+
+            document.getElementById('edit-spot-modal').classList.remove('hidden');
+        };
+
+        window.closeEditSpotModal = function() {
+            document.getElementById('edit-spot-modal').classList.add('hidden');
+            editSpotIdx = null;
+        };
+
+        window.saveSpotChanges = async function() {
+            if (editSpotIdx === null) return;
+            const day = window.currentDay;
+            const spot = window.itineraryData[day].spots[editSpotIdx];
+
+            spot.time = document.getElementById('edit-spot-time').value.trim();
+            spot.category = document.getElementById('edit-spot-category').value;
+            spot.name = document.getElementById('edit-spot-name').value.trim();
+            spot.desc = document.getElementById('edit-spot-desc').value.trim();
+            spot.tips = document.getElementById('edit-spot-tips').value.trim();
+            spot.parking = document.getElementById('edit-spot-parking').value.trim();
+            spot.gas = document.getElementById('edit-spot-gas').value.trim();
+            spot.tag = document.getElementById('edit-spot-tag').value.trim();
+
+            closeEditSpotModal();
+            await persistItineraryChanges(day);
+            showCustomAlert("💾 儲存成功！", "行程內容已同步至雲端與本機手帳囉！", false);
+        };
+
+        // 天氣穿搭編輯 Modal 開關與保存
+        window.openEditWeatherModal = function() {
+            const day = window.currentDay;
+            const weatherText = window.itineraryData[day].weather;
+            document.getElementById('weather-edit-title').textContent = `Day ${day} 天氣穿著提示`;
+            document.getElementById('edit-weather-text').value = weatherText;
+            document.getElementById('edit-weather-modal').classList.remove('hidden');
+        };
+
+        window.closeEditWeatherModal = function() {
+            document.getElementById('edit-weather-modal').classList.add('hidden');
+        };
+
+        window.saveWeatherChanges = async function() {
+            const day = window.currentDay;
+            const newText = document.getElementById('edit-weather-text').value.trim();
+            
+            window.itineraryData[day].weather = newText;
+            closeEditWeatherModal();
+            await persistItineraryChanges(day);
+            showCustomAlert("👕 穿搭天氣修改成功！", "全體團員手機畫面已即時同步更新！", false);
+        };
 
         window.openPhotoModal = function(day, spotIdx) {
             window.selectedSpotIndex = { day, spotIdx };
