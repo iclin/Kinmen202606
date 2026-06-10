@@ -1446,25 +1446,3 @@ const firebaseConfig = {
     </script>
 </body>
 </html>
-```
-eof
-
-### 🛠️ 兩步解決同步盲點：
-
-1. **請記得重新貼上你的專屬 Firebase 金鑰**：
-   因為更新了整個 `index.html`，上傳到 GitHub 前，請再次把你的專屬 **Firebase Config 金鑰** 貼回程式碼第 **443 行左右**的 `firebaseConfig` 中喔！
-
-2. **如果電腦上跳出「寫入失敗」警告**：
-   那 100% 代表你的 Firebase 資料庫權限卡住了。請依照下面的方式，去你的 **Firebase Console** 開啟寫入綠燈：
-   * 進入你的 Firebase 專案，點擊左側 **Firestore Database**。
-   * 點選上方的 **「Rules」**（規則）分頁。
-   * 將規則修改為**測試模式**，代碼如下：
-     ```javascript
-     rules_version = '2';
-     service cloud.firestore {
-       match /databases/{database}/documents {
-         match /{document=**} {
-           allow read, write: if true;
-         }
-       }
-     }
