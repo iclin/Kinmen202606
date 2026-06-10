@@ -279,7 +279,7 @@
             </div>
         </div>
 
-        <!-- 💡 行程編輯 Modal -->
+        <!-- 行程編輯 Modal -->
         <div id="edit-spot-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
             <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl border border-slate-100 flex flex-col transform scale-95 transition-all duration-300 max-h-[90vh]">
                 <div class="px-6 pt-6 pb-2 flex justify-between items-center shrink-0 border-b border-slate-100">
@@ -336,7 +336,7 @@
             </div>
         </div>
 
-        <!-- 💡 天氣編輯 Modal -->
+        <!-- 天氣編輯 Modal -->
         <div id="edit-weather-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
             <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl border border-slate-100 flex flex-col transform scale-95 transition-all duration-300">
                 <div class="px-6 pt-6 pb-2 flex justify-between items-center shrink-0 border-b border-slate-100">
@@ -434,7 +434,7 @@ const firebaseConfig = {
             }
         } catch(e) { console.warn("舊資料升級異常", e); }
 
-        // 優先載入本地備份：讓使用者打開網頁瞬間就能看到資料，消滅空白等待期！
+        // 優先讀取本地緩存，秒速呈現
         window.bills = JSON.parse(localStorage.getItem('kinmen_bills')) || [];
 
         if (hasValidKey) {
@@ -833,6 +833,7 @@ const firebaseConfig = {
                     });
                 } catch (e) {
                     console.error("雲端同步行程失敗：", e);
+                    showCustomAlert("⚠️ 行程同步失敗", "行程修改已存在本機，但雲端寫入被拒絕。請檢查 Firestore Database 是否已啟用，且規則設定為開放讀寫！", false);
                 }
             }
         }
@@ -849,18 +850,14 @@ const firebaseConfig = {
                     cloudBills.push({ id: doc.id, ...data });
                 });
                 
-                // 智慧融合演算法：
-                // 1. 保留所有最新的雲端紀錄
-                // 2. 檢查本地暫存：若本地紀錄的 uid 尚未出現在雲端，代表是斷網或還沒寫入成功的草稿，必須原地保留！
+                // 智慧融合去重
                 const localBills = JSON.parse(localStorage.getItem('kinmen_bills')) || [];
                 const cloudUids = new Set(cloudBills.map(b => b.uid));
                 const unsyncedLocalBills = localBills.filter(b => b.uid && !cloudUids.has(b.uid));
                 
-                // 3. 雙軌融合，依時間排序
                 window.bills = [...cloudBills, ...unsyncedLocalBills];
                 window.bills.sort((a, b) => b.timestamp - a.timestamp);
                 
-                // 4. 重寫安全本地快取備份，確保重啟不消失
                 localStorage.setItem('kinmen_bills', JSON.stringify(window.bills));
                 renderBillingUI();
             }, (err) => {
@@ -877,10 +874,10 @@ const firebaseConfig = {
         }
 
         async function saveBill(billItem) {
-            // A. 第一防線：先安全存入本地，確保無論任何原因都不會白記！
+            // 先安全存入本地，確保無論如何都不會白記
             saveBillToLocal(billItem);
 
-            // B. 第二防線：若亮綠燈，向 Firebase 雲端廣播同步
+            // 若亮綠燈，向 Firebase 雲端廣播同步
             if (isCloudMode && db) {
                 try {
                     const billingCollection = collection(db, 'artifacts', appId, 'public', 'data', 'expenses');
@@ -890,16 +887,14 @@ const firebaseConfig = {
                     });
                 } catch (e) {
                     console.error("寫入雲端失敗：", e);
-                    showCustomAlert("⚠️ 雲端連線不穩", "這筆帳目已先存於本機。請檢查 Firebase 規則是否為測試模式！", false);
+                    // 💡 主動抓出寫入阻擋（如規則未設為開放、或資料庫未正確初始化）
+                    showCustomAlert("⚠️ 雲端寫入失敗！", "這筆帳目已成功存在這台電腦，但「未能上傳雲端」。請檢查您的 Firestore Database 規則（Rules）是否已設定為「測試模式」，或您的 Firebase 資料庫是否未成功建立！", false);
                 }
             }
         }
 
         function saveBillToLocal(billItem) {
-            // 本地暫存不洗掉其他人的資料，直接插在最頂端
             const localBills = JSON.parse(localStorage.getItem('kinmen_bills')) || [];
-            
-            // 避免重複寫入同一個 uid
             if (!localBills.some(b => b.uid === billItem.uid)) {
                 localBills.unshift(billItem);
                 window.bills = localBills;
@@ -911,21 +906,19 @@ const firebaseConfig = {
         window.deleteBillItem = async function(id, uid) {
             showCustomAlert("⚠️ 確定要刪除這筆帳目嗎？", "刪除後資料將無法復原喔！", true, async (confirmed) => {
                 if (confirmed) {
-                    // 1. 本地立即清除 (反應速度拉滿)
                     let localBills = JSON.parse(localStorage.getItem('kinmen_bills')) || [];
                     localBills = localBills.filter(b => b.uid !== uid);
                     window.bills = localBills;
                     localStorage.setItem('kinmen_bills', JSON.stringify(localBills));
                     renderBillingUI();
 
-                    // 2. 雲端同步刪除
                     if (isCloudMode && db && id && !id.startsWith('local_')) {
                         try {
                             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id);
                             await deleteDoc(docRef);
                         } catch (e) {
                             console.error("刪除雲端資料失敗：", e);
-                            showCustomAlert("⚠️ 雲端刪除失敗", "本機已刪除，雲端暫因權限無法移除。", false);
+                            showCustomAlert("⚠️ 雲端刪除失敗", "本機已刪除，但雲端暫無法移除。", false);
                         }
                     }
                 }
@@ -1014,7 +1007,7 @@ const firebaseConfig = {
             const container = document.getElementById('itinerary-cards');
             const data = window.itineraryData[window.currentDay];
             
-            // 同步更新指南分頁
+            // 同步更新指南分頁的天氣提示
             const dayLabel = document.getElementById('weather-day-label');
             const tipText = document.getElementById('weather-tip-text');
             if (dayLabel) dayLabel.textContent = `Day ${window.currentDay}`;
@@ -1453,3 +1446,25 @@ const firebaseConfig = {
     </script>
 </body>
 </html>
+```
+eof
+
+### 🛠️ 兩步解決同步盲點：
+
+1. **請記得重新貼上你的專屬 Firebase 金鑰**：
+   因為更新了整個 `index.html`，上傳到 GitHub 前，請再次把你的專屬 **Firebase Config 金鑰** 貼回程式碼第 **443 行左右**的 `firebaseConfig` 中喔！
+
+2. **如果電腦上跳出「寫入失敗」警告**：
+   那 100% 代表你的 Firebase 資料庫權限卡住了。請依照下面的方式，去你的 **Firebase Console** 開啟寫入綠燈：
+   * 進入你的 Firebase 專案，點擊左側 **Firestore Database**。
+   * 點選上方的 **「Rules」**（規則）分頁。
+   * 將規則修改為**測試模式**，代碼如下：
+     ```javascript
+     rules_version = '2';
+     service cloud.firestore {
+       match /databases/{database}/documents {
+         match /{document=**} {
+           allow read, write: if true;
+         }
+       }
+     }
