@@ -419,6 +419,24 @@ const firebaseConfig = {
 
         const hasValidKey = firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY";
 
+        // 自動遷移與升級歷史紀錄：確保每筆老記帳都有獨一無二的 uid，避免遺失
+        try {
+            let localBills = JSON.parse(localStorage.getItem('kinmen_bills')) || [];
+            let migrated = false;
+            localBills.forEach(b => {
+                if (!b.uid) {
+                    b.uid = 'bill_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    migrated = true;
+                }
+            });
+            if (migrated) {
+                localStorage.setItem('kinmen_bills', JSON.stringify(localBills));
+            }
+        } catch(e) { console.warn("舊資料升級異常", e); }
+
+        // 優先載入本地備份：讓使用者打開網頁瞬間就能看到資料，消滅空白等待期！
+        window.bills = JSON.parse(localStorage.getItem('kinmen_bills')) || [];
+
         if (hasValidKey) {
             try {
                 const app = initializeApp(firebaseConfig);
@@ -429,9 +447,9 @@ const firebaseConfig = {
                     isCloudMode = true;
                     updateCloudStatus(true);
                     initCloudSync();
-                    initItineraryCloudSync(); // 啟用行程雲端同步監聽
+                    initItineraryCloudSync();
                 }).catch((err) => {
-                    console.warn("Firebase 登入失敗，自動降級為本機模式：", err);
+                    console.warn("Firebase 登入失敗，自動降級為本機安全模式：", err);
                     isCloudMode = false;
                     updateCloudStatus(false);
                     initLocalMode();
@@ -467,7 +485,6 @@ const firebaseConfig = {
         window.currentDay = 1;
         window.currentTab = 'itinerary';
         window.selectedSpotIndex = null;
-        window.bills = [];
         window.photoLogs = JSON.parse(localStorage.getItem('photoLogs')) || {};
 
         window.itineraryData = {
@@ -824,17 +841,30 @@ const firebaseConfig = {
             if (!db) return;
             const billingCollection = collection(db, 'artifacts', appId, 'public', 'data', 'expenses');
             
+            // 監聽 Firebase 雲端數據，與本地進行智慧非覆蓋式合併
             onSnapshot(billingCollection, (snapshot) => {
                 const cloudBills = [];
                 snapshot.forEach((doc) => {
                     const data = doc.data();
                     cloudBills.push({ id: doc.id, ...data });
                 });
-                cloudBills.sort((a, b) => b.timestamp - a.timestamp);
-                window.bills = cloudBills;
+                
+                // 智慧融合演算法：
+                // 1. 保留所有最新的雲端紀錄
+                // 2. 檢查本地暫存：若本地紀錄的 uid 尚未出現在雲端，代表是斷網或還沒寫入成功的草稿，必須原地保留！
+                const localBills = JSON.parse(localStorage.getItem('kinmen_bills')) || [];
+                const cloudUids = new Set(cloudBills.map(b => b.uid));
+                const unsyncedLocalBills = localBills.filter(b => b.uid && !cloudUids.has(b.uid));
+                
+                // 3. 雙軌融合，依時間排序
+                window.bills = [...cloudBills, ...unsyncedLocalBills];
+                window.bills.sort((a, b) => b.timestamp - a.timestamp);
+                
+                // 4. 重寫安全本地快取備份，確保重啟不消失
+                localStorage.setItem('kinmen_bills', JSON.stringify(window.bills));
                 renderBillingUI();
             }, (err) => {
-                console.error("Firestore 即時監聽錯誤：", err);
+                console.error("Firestore 即時監聽失敗，啟動本機保護：", err);
                 isCloudMode = false;
                 updateCloudStatus(false);
                 initLocalMode();
@@ -847,6 +877,10 @@ const firebaseConfig = {
         }
 
         async function saveBill(billItem) {
+            // A. 第一防線：先安全存入本地，確保無論任何原因都不會白記！
+            saveBillToLocal(billItem);
+
+            // B. 第二防線：若亮綠燈，向 Firebase 雲端廣播同步
             if (isCloudMode && db) {
                 try {
                     const billingCollection = collection(db, 'artifacts', appId, 'public', 'data', 'expenses');
@@ -855,39 +889,44 @@ const firebaseConfig = {
                         timestamp: Date.now()
                     });
                 } catch (e) {
-                    console.error("寫入雲端失敗，改存本機：", e);
-                    saveBillToLocal(billItem);
+                    console.error("寫入雲端失敗：", e);
+                    showCustomAlert("⚠️ 雲端連線不穩", "這筆帳目已先存於本機。請檢查 Firebase 規則是否為測試模式！", false);
                 }
-            } else {
-                saveBillToLocal(billItem);
             }
         }
 
         function saveBillToLocal(billItem) {
-            const newBill = {
-                id: 'local_' + Date.now(),
-                ...billItem,
-                timestamp: Date.now()
-            };
-            window.bills.unshift(newBill);
-            localStorage.setItem('kinmen_bills', JSON.stringify(window.bills));
-            renderBillingUI();
+            // 本地暫存不洗掉其他人的資料，直接插在最頂端
+            const localBills = JSON.parse(localStorage.getItem('kinmen_bills')) || [];
+            
+            // 避免重複寫入同一個 uid
+            if (!localBills.some(b => b.uid === billItem.uid)) {
+                localBills.unshift(billItem);
+                window.bills = localBills;
+                localStorage.setItem('kinmen_bills', JSON.stringify(localBills));
+                renderBillingUI();
+            }
         }
 
-        window.deleteBillItem = async function(id) {
+        window.deleteBillItem = async function(id, uid) {
             showCustomAlert("⚠️ 確定要刪除這筆帳目嗎？", "刪除後資料將無法復原喔！", true, async (confirmed) => {
                 if (confirmed) {
-                    if (isCloudMode && db && !id.startsWith('local_')) {
+                    // 1. 本地立即清除 (反應速度拉滿)
+                    let localBills = JSON.parse(localStorage.getItem('kinmen_bills')) || [];
+                    localBills = localBills.filter(b => b.uid !== uid);
+                    window.bills = localBills;
+                    localStorage.setItem('kinmen_bills', JSON.stringify(localBills));
+                    renderBillingUI();
+
+                    // 2. 雲端同步刪除
+                    if (isCloudMode && db && id && !id.startsWith('local_')) {
                         try {
                             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id);
                             await deleteDoc(docRef);
                         } catch (e) {
                             console.error("刪除雲端資料失敗：", e);
+                            showCustomAlert("⚠️ 雲端刪除失敗", "本機已刪除，雲端暫因權限無法移除。", false);
                         }
-                    } else {
-                        window.bills = window.bills.filter(b => b.id !== id);
-                        localStorage.setItem('kinmen_bills', JSON.stringify(window.bills));
-                        renderBillingUI();
                     }
                 }
             });
@@ -898,7 +937,7 @@ const firebaseConfig = {
                 if (confirmed) {
                     if (isCloudMode && db) {
                         for (let b of window.bills) {
-                            if (!b.id.startsWith('local_')) {
+                            if (b.id && !b.id.startsWith('local_')) {
                                 try {
                                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'expenses', b.id));
                                 } catch (e) { console.error(e); }
@@ -1210,12 +1249,17 @@ const firebaseConfig = {
                 return;
             }
 
+            // 新增獨特的身分證 UID，防止被覆蓋
+            const uid = 'bill_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
             const billItem = {
+                uid,
                 item,
                 amount,
                 payer,
                 splitters,
-                date: new Date().toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' })
+                date: new Date().toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }),
+                timestamp: Date.now()
             };
 
             await saveBill(billItem);
@@ -1251,7 +1295,7 @@ const firebaseConfig = {
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="font-bold text-slate-800 font-mono">NT$ ${bill.amount}</span>
-                        <button onclick="deleteBillItem('${bill.id}')" class="text-rose-400 hover:text-rose-600 font-bold px-1.5 py-1 text-base">×</button>
+                        <button onclick="deleteBillItem('${bill.id || ''}', '${bill.uid || ''}')" class="text-rose-400 hover:text-rose-600 font-bold px-1.5 py-1 text-base">×</button>
                     </div>
                 `;
                 listContainer.appendChild(itemDiv);
